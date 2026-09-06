@@ -8,6 +8,8 @@ extends CanvasLayer
 @onready var M1: AnimatedSprite2D = (
 	$VBoxContainer/HBoxContainer2/AnimatedSprite2D
 )
+@onready var M3: AnimatedSprite2D = $VBoxContainer/HBoxContainer3/AnimatedSprite2D
+
 
 var man_player: Player
 var _inicializado: bool = false

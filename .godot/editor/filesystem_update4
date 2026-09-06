@@ -1,1 +1,7 @@
 res://Scenes/scripts/scene_trigger.gd
+res://Scenes/principal.tscn
+res://Objects/extintor.tscn
+res://Scripts/Objects/Button/animated_button.gd
+res://TelaMorte/morreu.tscn
+res://Scenes/andar_hall.tscn
+res://Scenes/scripts/quest_mission.gd

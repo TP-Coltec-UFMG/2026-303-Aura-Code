@@ -3,6 +3,7 @@
 [ext_resource type="Shader" uid="uid://domit7v3xvssn" path="res://shaders/metalic.gdshader" id="1_8ed56"]
 [ext_resource type="Texture2D" uid="uid://nifi2fwqw84x" path="res://Sprites/ui/Logo/sprite_0.png" id="2_8ibws"]
 [ext_resource type="Texture2D" uid="uid://3v65ns525vg8" path="res://Sprites/transitions/Transition.png" id="6_1d07u"]
+[ext_resource type="Texture2D" uid="uid://d1awdirspci8q" path="res://TelaMorte/New Piskel-1.png(3).png" id="7_au6yr"]
 [ext_resource type="Shader" uid="uid://eth68kkqm6mj" path="res://shaders/blur.gdshader" id="7_e1iit"]
 [ext_resource type="PackedScene" uid="uid://b25tlu8urnkux" path="res://Scenes/Utils/filtro_daltonismo.tscn" id="8_8ed56"]
 [ext_resource type="Texture2D" uid="uid://b67vypnt7g1nt" path="res://Sprites/ui/Icons/mundo.png" id="8_8ibws"]
@@ -65,7 +66,7 @@ script/source = "extends Node2D
 @onready var transition: AnimatedSprite2D = $Transition
 @onready var primeira_vez: Node2D = $PrimeiraVez
 @onready var new_game_button: Button = $\"Menu Inicial/VContainer/NewGameButton\"
-var reset_confirmation: Control
+@onready var confirmacao_reiniciar: Control = $\"Menu Inicial/Confirmacao_reiniciar\"
 
 
 var scene_to_change_path: String
@@ -91,9 +92,9 @@ func _ready() -> void:
 		Configs._change_primeira_vez()
 	else:
 		primeira_vez.visible = false
+	confirmacao_reiniciar.hide()
 
 	atualizar_botao_jogo()
-	_configurar_novo_jogo()
 
 	var interface_index: int = int(Configs.configs.get(\"interface_size\", 0))
 	call_deferred(\"aplicar_tamanho_interface_por_index\", interface_index)
@@ -218,7 +219,8 @@ func aplicar_escala_node(node: Node, fator: float, interface_index: int) -> void
 
 			var nova_posicao: Vector2 = option_button.position
 			nova_posicao.y = base_position_y - diferenca_fonte
-			option_button.position = nova_posicao
+			if not _posicao_fixa_tela(option_button):
+				option_button.position = nova_posicao
 
 			var popup: PopupMenu = option_button.get_popup()
 			if popup != null:
@@ -242,7 +244,8 @@ func aplicar_escala_node(node: Node, fator: float, interface_index: int) -> void
 
 			var nova_posicao: Vector2 = check_box.position
 			nova_posicao.y = base_position_y - diferenca_fonte
-			check_box.position = nova_posicao
+			if not _posicao_fixa_tela(check_box):
+				check_box.position = nova_posicao
 
 	elif node is Button:
 		var button := node as Button
@@ -262,7 +265,8 @@ func aplicar_escala_node(node: Node, fator: float, interface_index: int) -> void
 
 			var nova_posicao: Vector2 = button.position
 			nova_posicao.y = base_position_y * fator
-			button.position = nova_posicao
+			if not _posicao_fixa_tela(button):
+				button.position = nova_posicao
 
 		if button.has_meta(\"base_expand_icon\"):
 			if interface_index == 2:
@@ -295,7 +299,8 @@ func aplicar_escala_node(node: Node, fator: float, interface_index: int) -> void
 			if interface_index == 2 and not esta_dentro_do_logo(label):
 				nova_posicao.y -= AJUSTE_LABEL_GRANDE
 
-			label.position = nova_posicao
+			if not _posicao_fixa_tela(label):
+				label.position = nova_posicao
 
 	elif node is Slider:
 		var slider := node as Slider
@@ -313,7 +318,8 @@ func aplicar_escala_node(node: Node, fator: float, interface_index: int) -> void
 
 			var nova_posicao: Vector2 = slider.position
 			nova_posicao.y = base_position_y * fator
-			slider.position = nova_posicao
+			if not _posicao_fixa_tela(slider):
+				slider.position = nova_posicao
 
 	elif node is Sprite2D:
 		var sprite := node as Sprite2D
@@ -329,7 +335,8 @@ func aplicar_escala_node(node: Node, fator: float, interface_index: int) -> void
 
 			var nova_posicao: Vector2 = sprite.position
 			nova_posicao.y = base_position_y * fator
-			sprite.position = nova_posicao
+			if not _posicao_fixa_tela(sprite):
+				sprite.position = nova_posicao
 
 	elif node is BoxContainer:
 		var box := node as BoxContainer
@@ -365,6 +372,14 @@ func esta_dentro_do_logo(node: Node) -> bool:
 		atual = atual.get_parent()
 
 	return false
+
+func _posicao_fixa_tela(node: Node) -> bool:
+	var atual := node
+	while atual != null:
+		if atual.name == \"Menu Inicial\" or atual.name == \"Confirmacao_reiniciar\":
+			return true
+		atual = atual.get_parent()
+	return false
 # ------------------------------------------------------
 
 
@@ -373,65 +388,14 @@ func esta_dentro_do_logo(node: Node) -> bool:
 
 # ---- M E N U  I N I C I A L ----
 func atualizar_botao_jogo() -> void:
+	var restart_button := get_node_or_null(\"Menu Inicial/VContainer/RestartGameButton\") as Button
+	if restart_button != null:
+		restart_button.visible = SaveGame.has_checkpoint()
 	if SaveGame.has_checkpoint():
 		new_game_button.text = \"CONTINUAR\"
 	else:
 		new_game_button.text = \"NOVO JOGO\"
-
-func _configurar_novo_jogo() -> void:
-	if not SaveGame.has_checkpoint():
-		return
-	var container := new_game_button.get_parent() as VBoxContainer
-	var row := HBoxContainer.new()
-	row.name = \"ContinueRow\"
-	container.add_child(row)
-	container.move_child(row, new_game_button.get_index())
-	container.remove_child(new_game_button)
-	row.add_child(new_game_button)
-	var botao_scene: PackedScene = load(\"res://Scenes/Utils/animated_button.tscn\") as PackedScene
-	var novo: Button = botao_scene.instantiate() as Button
-	novo.name = \"NovoJogoButton\"
-	novo.text = \"NOVO JOGO\"
-	novo.scale = Vector2(0.72, 0.72)
-	novo.hover_scale = Vector2(0.792, 0.792)
-	novo.press_scale = Vector2(0.684, 0.684)
-	novo.modulate = Color(1, 1, 1, 0.5)
-	novo.mouse_entered.connect(Callable(self, \"_novo_jogo_mouse_entered\").bind(novo))
-	novo.mouse_exited.connect(Callable(self, \"_novo_jogo_mouse_exited\").bind(novo))
-	novo.pressed.connect(_on_novo_jogo_pressed)
-	row.add_child(novo)
-	var morte_scene: PackedScene = load(\"res://TelaMorte/morreu.tscn\") as PackedScene
-	var morte: Control = morte_scene.instantiate() as Control
-	add_child(morte)
-	reset_confirmation = morte.get_node(\"Confirmacao_reiniciar\") as Control
-	morte.remove_child(reset_confirmation)
-	morte.queue_free()
-	add_child(reset_confirmation)
-	reset_confirmation.hide()
-	var botao_sim := reset_confirmation.get_node(\"sim\") as Control
-	var botao_nao := reset_confirmation.get_node(\"nao\") as Control
-	botao_sim.position.y += 40.0
-	botao_nao.position.y += 40.0
-	botao_sim.pressed.connect(_confirmar_novo_jogo)
-	botao_nao.pressed.connect(_cancelar_novo_jogo)
-
-func _on_novo_jogo_pressed() -> void:
-	if is_instance_valid(reset_confirmation):
-		reset_confirmation.show()
-
-func _novo_jogo_mouse_entered(button: Button) -> void:
-	button.modulate.a = 1.0
-
-func _novo_jogo_mouse_exited(button: Button) -> void:
-	button.modulate.a = 0.5
-
-func _confirmar_novo_jogo() -> void:
-	SaveGame.reset_progress()
-
-func _cancelar_novo_jogo() -> void:
-	if is_instance_valid(reset_confirmation):
-		reset_confirmation.hide()
-		
+	
 func _on_new_game_button_pressed() -> void:
 	transition.play(\"default\")
 	await transition.animation_finished
@@ -488,9 +452,46 @@ func _on_back_to_menu_button_pressed() -> void:
 	$BackgroundMenuInicial.visible = true
 	$BackgroundMenuOptions.visible = false
 
-	$\"Menu Inicial/VContainer/NewGameButton\".grab_focus()
+	_focar_menu_inicial()
 
 	transition.play_backwards(\"default\")
+
+func _focar_menu_inicial() -> void:
+	if is_instance_valid(new_game_button):
+		new_game_button.grab_focus()
+		return
+	var botao := get_node_or_null(\"Menu Inicial/VContainer/NewGameButton\") as Button
+	if botao != null:
+		botao.grab_focus()
+
+func _on_restart_game_button_pressed() -> void:
+	confirmacao_reiniciar.show()
+	confirmacao_reiniciar.get_node(\"sim\").grab_focus()
+
+func _on_sim_pressed() -> void:
+	confirmacao_reiniciar.hide()
+	SaveGame.reset_progress()
+
+func _on_nao_pressed() -> void:
+	confirmacao_reiniciar.hide()
+	var restart := get_node_or_null(\"Menu Inicial/VContainer/RestartGameButton\") as Button
+	if restart != null:
+		restart.grab_focus()
+
+func _on_restart_game_button_mouse_entered() -> void:
+	var restart := get_node_or_null(\"Menu Inicial/VContainer/RestartGameButton\") as CanvasItem
+	if restart != null:
+		restart.modulate.a = 1.0
+
+func _on_nao_mouse_entered() -> void:
+	var nao := confirmacao_reiniciar.get_node_or_null(\"nao\") as CanvasItem
+	if nao != null:
+		nao.modulate.a = 1.0
+
+func _on_sim_mouse_entered() -> void:
+	var sim := confirmacao_reiniciar.get_node_or_null(\"sim\") as CanvasItem
+	if sim != null:
+		sim.modulate.a = 1.0
 
 func _on_menu_sounds_settings_pressed() -> void:
 	transition.play(\"default\")
@@ -650,6 +651,14 @@ func _button_un_hover() -> void:
 	animation_tween = create_tween().set_trans(Tween.TRANS_SINE)
 	animation_tween.tween_property(self, \"scale\", Vector2.ONE, un_hover_animation_length)
 "
+
+[sub_resource type="LabelSettings" id="LabelSettings_gulxn"]
+font = ExtResource("8_cwg8b")
+font_size = 36
+
+[sub_resource type="LabelSettings" id="LabelSettings_brbsc"]
+font = ExtResource("49_ux6ub")
+font_size = 20
 
 [sub_resource type="GDScript" id="GDScript_d2tqo"]
 script/source = "extends Node2D
@@ -927,23 +936,27 @@ focus_color = Color(1, 0.81960785, 0.4, 0.32941177)
 position = Vector2(-8, 0)
 script = SubResource("GDScript_aduey")
 
-[node name="Sprite2D" type="Sprite2D" parent="Menu Inicial" unique_id=900053132]
-material = SubResource("ShaderMaterial_g4v7s")
-position = Vector2(132, 88)
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_8ibws")
-metadata/_edit_lock_ = true
-
 [node name="VContainer" type="VBoxContainer" parent="Menu Inicial" unique_id=198518198]
-offset_left = 75.0
-offset_top = 120.0
-offset_right = 179.0
-offset_bottom = 216.0
+offset_left = 79.0
+offset_top = 88.0
+offset_right = 183.0
+offset_bottom = 244.0
 pivot_offset = Vector2(44, 44)
 alignment = 1
-metadata/_edit_lock_ = true
 
-[node name="NewGameButton" parent="Menu Inicial/VContainer" unique_id=464511439 groups=["alto_contraste"] instance=ExtResource("8_e46k6")]
+[node name="Sprite2D" type="Sprite2D" parent="Menu Inicial/VContainer" unique_id=900053132]
+material = SubResource("ShaderMaterial_g4v7s")
+position = Vector2(62, -32)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_8ibws")
+
+[node name="NewGameButton" parent="Menu Inicial/VContainer" unique_id=1777572707 groups=["alto_contraste"] instance=ExtResource("8_e46k6")]
+layout_mode = 2
+size_flags_vertical = 4
+text = "NOVO JOGO"
+
+[node name="RestartGameButton" parent="Menu Inicial/VContainer" unique_id=464511439 groups=["alto_contraste"] instance=ExtResource("8_e46k6")]
+visible = false
 layout_mode = 2
 size_flags_vertical = 4
 text = "NOVO JOGO"
@@ -965,6 +978,93 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "SAIR"
 script = SubResource("GDScript_dwq42")
+
+[node name="Confirmacao_reiniciar" type="Control" parent="Menu Inicial" unique_id=1212539035]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 8.0
+offset_right = 488.0
+offset_bottom = 272.0
+
+[node name="ColorRect" type="ColorRect" parent="Menu Inicial/Confirmacao_reiniciar" unique_id=1868130673]
+layout_mode = 0
+offset_right = 480.0
+offset_bottom = 272.0
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="Menu Inicial/Confirmacao_reiniciar" unique_id=1905960489]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -176.0
+offset_top = -72.0
+offset_right = 176.0
+offset_bottom = -27.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "VOCÊ TEM CERTEZA ?"
+label_settings = SubResource("LabelSettings_gulxn")
+
+[node name="Label2" type="Label" parent="Menu Inicial/Confirmacao_reiniciar" unique_id=1935882813]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -176.0
+offset_top = -40.0
+offset_right = 176.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Deseja reiniciar o progresso?"
+label_settings = SubResource("LabelSettings_brbsc")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="sim" type="Button" parent="Menu Inicial/Confirmacao_reiniciar" unique_id=579340350]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -93.0
+offset_top = 8.0
+offset_right = -7.0
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("8_cwg8b")
+theme_override_font_sizes/font_size = 23
+text = "SIM"
+icon = ExtResource("7_au6yr")
+script = ExtResource("14_a2p0c")
+metadata/_custom_type_script = "uid://dfvk0re1w0h2c"
+
+[node name="nao" type="Button" parent="Menu Inicial/Confirmacao_reiniciar" unique_id=923670125]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 13.5
+offset_top = 8.0
+offset_right = 86.5
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("8_cwg8b")
+theme_override_font_sizes/font_size = 23
+text = "NÃO"
+script = ExtResource("14_a2p0c")
+metadata/_custom_type_script = "uid://dfvk0re1w0h2c"
 
 [node name="Opcoes" type="Node2D" parent="." unique_id=316651987]
 visible = false
@@ -2027,12 +2127,18 @@ script = ExtResource("10_e46k6")
 
 [connection signal="mouse_entered" from="Menu Inicial/VContainer/NewGameButton" to="Menu Inicial" method="_on_new_game_button_mouse_entered"]
 [connection signal="pressed" from="Menu Inicial/VContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]
+[connection signal="mouse_entered" from="Menu Inicial/VContainer/RestartGameButton" to="." method="_on_restart_game_button_mouse_entered"]
+[connection signal="pressed" from="Menu Inicial/VContainer/RestartGameButton" to="." method="_on_restart_game_button_pressed"]
 [connection signal="mouse_entered" from="Menu Inicial/VContainer/TutorialButton" to="Menu Inicial" method="_on_tutorial_button_mouse_entered"]
 [connection signal="pressed" from="Menu Inicial/VContainer/TutorialButton" to="." method="_on_tutorial_button_pressed"]
 [connection signal="mouse_entered" from="Menu Inicial/VContainer/OptionsGameButton" to="Menu Inicial" method="_on_options_game_button_mouse_entered"]
 [connection signal="pressed" from="Menu Inicial/VContainer/OptionsGameButton" to="." method="_on_options_game_button_pressed"]
 [connection signal="mouse_entered" from="Menu Inicial/VContainer/ExitGameButton" to="Menu Inicial" method="_on_exit_game_button_mouse_entered"]
 [connection signal="pressed" from="Menu Inicial/VContainer/ExitGameButton" to="." method="_on_exit_game_button_pressed"]
+[connection signal="mouse_entered" from="Menu Inicial/Confirmacao_reiniciar/sim" to="." method="_on_sim_mouse_entered"]
+[connection signal="pressed" from="Menu Inicial/Confirmacao_reiniciar/sim" to="." method="_on_sim_pressed"]
+[connection signal="mouse_entered" from="Menu Inicial/Confirmacao_reiniciar/nao" to="." method="_on_nao_mouse_entered"]
+[connection signal="pressed" from="Menu Inicial/Confirmacao_reiniciar/nao" to="." method="_on_nao_pressed"]
 [connection signal="item_selected" from="Opcoes/VContainer/OptionLanguageButton" to="Opcoes/VContainer/OptionLanguageButton" method="_on_item_selected"]
 [connection signal="mouse_entered" from="Opcoes/VContainer/OptionLanguageButton" to="Opcoes" method="_on_option_language_button_mouse_entered"]
 [connection signal="mouse_entered" from="Opcoes/VContainer/VContainer/MenuSoundsSettings" to="Opcoes" method="_on_menu_sounds_settings_mouse_entered"]

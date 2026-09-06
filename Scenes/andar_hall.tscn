@@ -817,7 +817,7 @@ script = ExtResource("18_h0r3n")
 offset_left = 374.0
 offset_top = 35.0
 offset_right = 480.0
-offset_bottom = 105.0
+offset_bottom = 116.0
 color = Color(0.094684996, 0.09468501, 0.09468501, 1)
 
 [node name="Label2" type="Label" parent="QUEST_MISSION" unique_id=623343459 groups=["alto_contraste"]]
@@ -835,9 +835,9 @@ anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
 offset_left = -87.0
-offset_top = -76.0
-offset_right = 62.0
-offset_bottom = -47.0
+offset_top = -84.0
+offset_right = 20.0
+offset_bottom = -23.0
 grow_horizontal = 0
 grow_vertical = 2
 theme_override_constants/separation = 5
@@ -866,6 +866,23 @@ text = "LIBERE O ELEVADOR"
 label_settings = SubResource("LabelSettings_xl0vw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="QUEST_MISSION/VBoxContainer/HBoxContainer" unique_id=269822958]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_g4v7s")
+frame = 1
+frame_progress = 1.0
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="QUEST_MISSION/VBoxContainer" unique_id=1312429330]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="QUEST_MISSION/VBoxContainer/HBoxContainer3" unique_id=1128449921 groups=["alto_contraste"]]
+layout_mode = 2
+text = "ESPERE TODO MUNDO 
+SAIR"
+label_settings = SubResource("LabelSettings_xl0vw")
+vertical_alignment = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="QUEST_MISSION/VBoxContainer/HBoxContainer3" unique_id=1848871589]
 position = Vector2(-8, 6)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_g4v7s")

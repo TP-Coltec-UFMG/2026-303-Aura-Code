@@ -1,10 +1,1 @@
-res://Scenes/scripts/pause_menu.gd
-res://Player/ManPlayer.tscn
-res://Scenes/principal.tscn
-res://NPC'S/clarxs.gd
-res://Scenes/scripts/quest_mission.gd
-res://Player/balao_de_pensamento.gd
-res://Scenes/line_2d.gd
-res://Scenes/scripts/base_scene.gd
 res://Scenes/scripts/scene_trigger.gd
-res://Scripts/Data/save/SaveGame.gd

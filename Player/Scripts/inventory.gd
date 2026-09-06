@@ -17,7 +17,7 @@ func _ready() -> void:
 		"gun": slot_1,
 		"cartao": slot_5,
 		"laptop": slot_4,
-		"faca": slot_3,
+		"cabo": slot_3,
 		"extintor": slot_6
 	}
 

@@ -7,8 +7,9 @@
 [ext_resource type="Texture2D" uid="uid://dei4d8qxmiky" path="res://Sprites/objects/alerta_luz.png" id="4_pondc"]
 [ext_resource type="PackedScene" uid="uid://mllbpd4v0u7f" path="res://Objects/extintor.tscn" id="5_3b6cl"]
 [ext_resource type="Texture2D" uid="uid://1v81ofhv621m" path="res://Sprites/objects/alarme2.png" id="5_eo3of"]
-[ext_resource type="PackedScene" uid="uid://ceroyqy22gqmd" path="res://Objects/Lanterna.tscn" id="6_iqkel"]
+[ext_resource type="PackedScene" uid="uid://cqqh1hauv7pvh" path="res://Objects/laptop.tscn" id="7_oq0xy"]
 [ext_resource type="PackedScene" uid="uid://bvhi27tium5k" path="res://Scenes/scene_trigger.tscn" id="7_rnk6w"]
+[ext_resource type="PackedScene" uid="uid://b6acfrqgxdwie" path="res://Objects/cabo.tscn" id="8_b3g1w"]
 [ext_resource type="PackedScene" uid="uid://c46ktfchhqx7n" path="res://Objects/painel_elevador.tscn" id="8_eb2mc"]
 [ext_resource type="PackedScene" uid="uid://7imdxwdbd00" path="res://NPC'S/Clarxs.tscn" id="8_hydi7"]
 [ext_resource type="Texture2D" uid="uid://ckg4qj4mj55ms" path="res://NPC'S/NPC/boneco_0.png" id="9_oq0xy"]
@@ -88,20 +89,24 @@ position = Vector2(10, -205.00002)
 scale = Vector2(0.51, 0.51)
 save_id = "extintor_andar_escritório_2"
 
-[node name="Lanterna" parent="Coletaveis" unique_id=336998762 instance=ExtResource("6_iqkel")]
-position = Vector2(-10.000001, -203.99998)
-scale = Vector2(0.28753498, 0.24209166)
-save_id = "lanterna_andar_escritório_1"
+[node name="Laptop" parent="Coletaveis" unique_id=1140399274 instance=ExtResource("7_oq0xy")]
+position = Vector2(169, -28.000004)
+rotation = -0.51427925
+scale = Vector2(0.615, 0.615)
+save_id = "laptop_sala_escritorio"
+
+[node name="Cabo" parent="Coletaveis" unique_id=1884432035 instance=ExtResource("8_b3g1w")]
+position = Vector2(85.99999, 29.000002)
+scale = Vector2(0.34, 0.34)
 
 [node name="NPCs" type="Node" parent="." unique_id=1711519153]
 
 [node name="NPC1" parent="NPCs" unique_id=406687579 instance=ExtResource("8_hydi7")]
 process_mode = 4
-visible = false
 z_index = 2
 position = Vector2(38, -199)
 sprite_sheet = ExtResource("9_oq0xy")
-dialog_texts = Array[String](["Alex: Cadê todo mundo? O que aconteceu aqui?", "Funcionário: A IA ficou maluca. Ela tomou o controle dos sistemas e está construindo uma superbomba.", "Alex: Uma superbomba? Como isso foi acontecer?", "Funcionário: O chefe fez alguma merda e perdeu o controle dela. A gente precisa falar com ele.", "Alex: Então chama ele!", "Funcionário: Eu já tentei. Ele não atende e a sala está trancada.", "Alex: Certo... então vamos ter que descobrir outro jeito de entrar lá."])
+dialog_texts = Array[String](["Alex: Cadê todo mundo? O que aconteceu aqui?", "Funcionário: A IA ficou maluca. Ela tomou o controle dos sistemas e está construindo uma superbomba.", "Alex: Uma superbomba? Como isso foi acontecer?", "Funcionário: O chefe fez alguma merda e perdeu o controle dela. A gente precisa falar com ele.", "Alex: Então chama ele!", "Funcionário: Eu já tentei. Ele não atende e a sala está trancada.", "Alex: Certo... então vamos ter que descobrir outro jeito de entrar lá.", "Funcionário: Eu vou voltar para o andar do data center. Enquanto isso, tenta pegar o cartão do chefe. Precisamos dele lá encima.", "Alex: Certo. Eu vou atrás do cartão."])
 dialog_enabled = false
 dialog_id = "office:npc_intro_dialog"
 save_id = "office_intro_npc"
@@ -109,10 +114,19 @@ run_speed = 40.0
 
 [node name="Line2D2" type="Line2D" parent="NPCs/NPC1" unique_id=559845400]
 position = Vector2(-2, 18)
-points = PackedVector2Array(2, -4, 7, 16, 31, 17, 64, 13, 66, -7, 66, -10)
+points = PackedVector2Array(2, -4, 18, -2, 32, 0, 52, -1, 66, -7, 66, -10)
 script = ExtResource("10_b3g1w")
 movement_type = 1
 random_at_end = false
+
+[node name="Line2D3" type="Line2D" parent="NPCs/NPC1" unique_id=439463493]
+position = Vector2(-2, 18)
+points = PackedVector2Array(66, -8, 47, 1, 21, -2, 6, -4, 1, -8, 1, -12)
+default_color = Color(0, 1, 1, 1)
+script = ExtResource("10_b3g1w")
+movement_type = 1
+random_at_end = false
+delete_npc_at_end = true
 
 [node name="ESCRITORIO" parent="." unique_id=1500386464 instance=ExtResource("3_kribp")]
 position = Vector2(-170, -241)

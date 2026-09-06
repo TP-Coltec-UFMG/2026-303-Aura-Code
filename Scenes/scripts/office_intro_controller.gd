@@ -3,11 +3,14 @@ extends Node
 const PLAYER_QUESTION_ID: String = "office:empty_floor"
 const NPC_SHOUT_ID: String = "office:npc_boss_shout"
 const NPC_DIALOG_ID: String = "office:npc_intro_dialog"
+const LAPTOP_FOUND_ID: String = "office:laptop_found"
+const LAPTOP_CABLE_HINT_ID: String = "office:laptop_cable_hint"
 const NPC_REVEAL_DELAY: float = 2.0
 
 var player: Player
 var npc: Node2D
 var npc_path: NPCPath
+var npc_return_path: NPCPath
 var npc_balloon: Sprite2D
 var reveal_scheduled: bool = false
 var shout_running: bool = false
@@ -23,22 +26,35 @@ func _initialize() -> void:
 		push_error("OfficeIntroController não encontrou o Player.")
 		return
 	player = office.player
+	if not player.balao_de_pensamento.pensamento_finalizado.is_connected(_on_player_thought_finished):
+		player.balao_de_pensamento.pensamento_finalizado.connect(_on_player_thought_finished)
+	if not DialogManager.dialog_finished.is_connected(_on_dialog_finished):
+		DialogManager.dialog_finished.connect(_on_dialog_finished)
+	var laptop_pickup := get_node_or_null("../Coletaveis/Laptop/PickupComponent") as PickupComponent
+	if laptop_pickup != null and not laptop_pickup.interagiu.is_connected(_on_laptop_collected):
+		laptop_pickup.interagiu.connect(_on_laptop_collected)
+
+	var state := SaveGame.office_mission_state(player)
 	npc = get_node_or_null("../NPCs/NPC1") as Node2D
+	if bool(state.get("office_npc_left_for_data_center", false)):
+		if is_instance_valid(npc):
+			npc.process_mode = Node.PROCESS_MODE_DISABLED
+			npc.hide()
+			npc.queue_free()
+		_show_boss_room_access_task()
+		return
 	if npc == null:
 		push_error("OfficeIntroController não encontrou NPCs/NPC1.")
 		return
 	npc_path = npc.get_node_or_null("Line2D2") as NPCPath
+	npc_return_path = npc.get_node_or_null("Line2D3") as NPCPath
 	npc_balloon = npc.get_node_or_null("BalaoDePensamento") as Sprite2D
-	if npc_path == null or npc_balloon == null:
-		push_error("NPC1 precisa do caminho Line2D2 e do BalaoDePensamento.")
+	if npc_path == null or npc_return_path == null or npc_balloon == null:
+		push_error("NPC1 precisa dos caminhos Line2D2, Line2D3 e do BalaoDePensamento.")
 		return
 
-	if not player.balao_de_pensamento.pensamento_finalizado.is_connected(_on_player_thought_finished):
-		player.balao_de_pensamento.pensamento_finalizado.connect(_on_player_thought_finished)
 	if not npc.is_connected(&"path_completed", _on_npc_path_completed):
 		npc.connect(&"path_completed", _on_npc_path_completed)
-	if not DialogManager.dialog_finished.is_connected(_on_dialog_finished):
-		DialogManager.dialog_finished.connect(_on_dialog_finished)
 
 	npc.call("set_dialog_enabled", false)
 	_restore_sequence()
@@ -49,6 +65,19 @@ func _restore_sequence() -> void:
 	var arrived := bool(state.get("office_npc_arrived", false))
 	var revealed := bool(state.get("office_npc_revealed", false))
 	var shout_finished := bool(state.get("office_npc_shout_finished", false))
+	var dialog_finished := bool(state.get("office_dialog_finished", false))
+	var return_started := bool(state.get("office_npc_return_started", false)) or dialog_finished
+
+	if return_started:
+		if not bool(state.get("office_npc_return_started", false)):
+			state["office_npc_return_started"] = true
+			SaveGame.save_global_state("hall_quest_01", state)
+		_show_npc()
+		npc.call("set_dialog_enabled", false)
+		_show_boss_room_access_task()
+		if not bool(npc.get("checkpoint_restored")) or bool(npc.get("path_finished")):
+			npc.call("start_path", npc_return_path)
+		return
 
 	if arrived:
 		_show_npc()
@@ -56,7 +85,10 @@ func _restore_sequence() -> void:
 			_move_npc_to_path_end()
 		if shout_finished:
 			npc.call("set_dialog_enabled", true)
-			_show_talk_task(bool(state.get("office_dialog_finished", false)))
+			if bool(state.get("office_dialog_finished", false)):
+				_show_boss_room_access_task()
+			else:
+				_show_talk_task(false)
 		else:
 			call_deferred("_npc_shout")
 		return
@@ -101,9 +133,16 @@ func _schedule_npc_reveal() -> void:
 
 
 func _on_npc_path_completed(finished_path: NPCPath) -> void:
-	if finished_path != npc_path or not _is_current_office():
+	if not _is_current_office():
 		return
 	var state := SaveGame.office_mission_state(player)
+	if finished_path == npc_return_path:
+		state["office_npc_left_for_data_center"] = true
+		SaveGame.save_global_state("hall_quest_01", state)
+		call_deferred("_save_checkpoint")
+		return
+	if finished_path != npc_path:
+		return
 	if bool(state.get("office_npc_arrived", false)):
 		return
 	state["office_npc_arrived"] = true
@@ -118,6 +157,10 @@ func _npc_shout() -> void:
 	var state := SaveGame.office_mission_state(player)
 	if bool(state.get("office_npc_shout_finished", false)):
 		npc.call("set_dialog_enabled", true)
+		if bool(state.get("office_dialog_finished", false)):
+			_show_boss_room_access_task()
+		else:
+			_show_talk_task(false)
 		return
 	shout_running = true
 	await npc_balloon.mostrar_texto("CHEFE! CHEFE!", NPC_SHOUT_ID)
@@ -137,15 +180,34 @@ func _on_dialog_finished(dialog_id: String) -> void:
 		return
 	var state := SaveGame.office_mission_state(player)
 	state["office_dialog_finished"] = true
+	state["office_npc_return_started"] = true
 	SaveGame.save_global_state("hall_quest_01", state)
-	_show_talk_task(true, true)
+	_show_boss_room_access_task()
+	npc.call("set_dialog_enabled", false)
+	npc.call("start_path", npc_return_path)
 	_save_checkpoint()
+
+
+func _on_laptop_collected() -> void:
+	if not _is_current_office():
+		return
+	player.balao_de_pensamento.enfileirar(LAPTOP_FOUND_ID, "Achei um laptop")
+	player.balao_de_pensamento.enfileirar(
+		LAPTOP_CABLE_HINT_ID,
+		"Com um cabo eu consigo hackear a porta!"
+	)
 
 
 func _show_talk_task(completed: bool, animate: bool = false) -> void:
 	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
 	if quest_ui != null:
 		quest_ui.show_talk_to_npc_task(completed, animate)
+
+
+func _show_boss_room_access_task() -> void:
+	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
+	if quest_ui != null:
+		quest_ui.show_find_boss_room_access_task()
 
 
 func _show_npc() -> void:

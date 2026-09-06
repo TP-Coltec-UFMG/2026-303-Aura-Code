@@ -125,7 +125,27 @@ func _run() -> void:
 	await get_tree().create_timer(0.4).timeout
 	_check(not DialogManager.is_showing_dialog and not get_tree().paused, "Espaço avança todas as falas e fecha o diálogo normalmente")
 	_check(bool(SaveGame.office_mission_state().get("office_dialog_finished", false)), "conversa concluída é salva")
-	await get_tree().create_timer(0.3).timeout
-	_check(painel.markers[3].frame == 1, "tarefa FALE COM O NPC é concluída ao terminar a conversa")
+	_check((painel.rows[3].get_node("Label3") as Label).text == "ENCONTRE UMA FORMA DE\nENTRAR NA SALA DO CHEFE", "fim da conversa mostra a nova tarefa em duas linhas")
+	_check(painel.markers[3].frame == 0, "nova tarefa para acessar a sala do chefe começa pendente")
+	_check(bool(SaveGame.office_mission_state().get("office_npc_return_started", false)), "fim do diálogo registra o retorno do NPC")
+	_check(npc.current_path == npc.get_node("Line2D3") and not npc.path_finished, "NPC inicia o caminho criado no editor de volta ao elevador")
+	_check(not npc.dialog_enabled, "NPC não aceita outro diálogo durante o retorno")
+	painel.refresh_saved_state()
+	_check((painel.rows[3].get_node("Label3") as Label).text == "ENCONTRE UMA FORMA DE\nENTRAR NA SALA DO CHEFE", "nova tarefa é restaurada corretamente pelo save")
+	var return_deadline := Time.get_ticks_msec() + 5000
+	while not bool(SaveGame.office_mission_state().get("office_npc_left_for_data_center", false)) and Time.get_ticks_msec() < return_deadline:
+		await get_tree().create_timer(0.05).timeout
+	_check(bool(SaveGame.office_mission_state().get("office_npc_left_for_data_center", false)), "NPC chega ao elevador e sua saída fica salva")
+	await get_tree().process_frame
+	_check(not is_instance_valid(npc), "NPC é removido ao terminar o caminho configurado")
+	var laptop := get_tree().current_scene.get_node("Coletaveis/Laptop")
+	laptop.get_node("PickupComponent").coletar()
+	await get_tree().process_frame
+	_check(player.inventory.get_item_on_inventary("laptop"), "laptop coletado entra no inventário")
+	_check(player.balao_de_pensamento.tem_pensamento("office:laptop_found"), "coleta do laptop agenda Achei um laptop")
+	_check(player.balao_de_pensamento.tem_pensamento("office:laptop_cable_hint"), "coleta do laptop agenda a dica do cabo")
+	_check(player.balao_de_pensamento.label.text == "Achei um laptop", "primeiro pensamento identifica o laptop")
+	await _finish_thought(player.balao_de_pensamento)
+	_check(player.balao_de_pensamento.label.text == "Com um cabo eu consigo hackear a porta!", "segundo pensamento explica como hackear a porta")
 	print("RESULT: ", failures, " failures")
 	get_tree().quit(1 if failures > 0 else 0)

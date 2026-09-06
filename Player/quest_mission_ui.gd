@@ -95,18 +95,29 @@ func show_talk_to_npc_task(completed: bool, animate: bool = false) -> void:
 	set_panel_visible(true)
 
 
+func show_find_boss_room_access_task(completed: bool = false, animate: bool = false) -> void:
+	for index in range(rows.size()):
+		set_task_visible(index, index == 3)
+	set_task_text(3, "ENCONTRE UMA FORMA DE\nENTRAR NA SALA DO CHEFE")
+	set_task_completed(3, completed, animate)
+	set_panel_visible(true)
+
+
 func refresh_saved_state() -> void:
 	var state := SaveGame.office_mission_state(get_parent() as Player)
 	var unlocked := bool(state.get("elevator_third_floor_unlocked", false))
 	var arrived := bool(state.get("arrived_third_floor", false))
 	var npc_ready := bool(state.get("office_npc_shout_finished", false))
 	var dialog_finished := bool(state.get("office_dialog_finished", false))
+	var boss_room_access_found := bool(state.get("office_boss_room_access_found", false))
 	if unlocked:
 		set_task_completed(0, true)
 		set_task_completed(1, true)
 		set_task_completed(2, true)
-		if npc_ready:
-			show_talk_to_npc_task(dialog_finished)
+		if dialog_finished:
+			show_find_boss_room_access_task(boss_room_access_found)
+		elif npc_ready:
+			show_talk_to_npc_task(false)
 		else:
 			show_only_third_floor_task(arrived)
 	else:

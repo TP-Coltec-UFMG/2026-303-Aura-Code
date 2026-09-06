@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://b6acfrqgxdwie"]
+
+[ext_resource type="Script" uid="uid://cr6q7vgk61v3w" path="res://Objects/scripts/cabo.gd" id="1_vp5sv"]
+[ext_resource type="PackedScene" uid="uid://bq87gqp7mwrnh" path="res://Interaction_components/interectable.tscn" id="2_mbghy"]
+[ext_resource type="Texture2D" uid="uid://b5pqbq7pxngrg" path="res://cabo_0-1.png.png" id="3_xudaw"]
+[ext_resource type="Texture2D" uid="uid://dfhkmwfxsu333" path="res://Sprites/ilumination/2d_lights_and_shadows_neutral_point_light.webp" id="4_6086x"]
+[ext_resource type="Script" uid="uid://dtfbuvijibmfx" path="res://Objects/scripts/PickupComponent.gd" id="5_cy1mi"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6hjy0"]
+radius = 50.01
+
+[node name="Cabo" type="Node2D" unique_id=1140399274]
+script = ExtResource("1_vp5sv")
+
+[node name="Interectable" parent="." unique_id=1406152477 instance=ExtResource("2_mbghy")]
+interact_name = "Cabo"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interectable" unique_id=1116452658]
+shape = SubResource("CircleShape2D_6hjy0")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1463579393]
+rotation = 6.890877e-05
+scale = Vector2(0.49, 0.49)
+texture = ExtResource("3_xudaw")
+
+[node name="PointLight2D2" type="PointLight2D" parent="." unique_id=54547402]
+position = Vector2(-0.0053356886, -0.97308934)
+rotation = 0.77991533
+scale = Vector2(0.017359087, 0.06006319)
+color = Color(0, 0, 0, 1)
+shadow_enabled = true
+shadow_filter = 2
+texture = ExtResource("4_6086x")
+
+[node name="PickupComponent" type="Node" parent="." unique_id=1455772730 node_paths=PackedStringArray("interactable")]
+script = ExtResource("5_cy1mi")
+item_id = "cabo"
+interactable = NodePath("../Interectable")
+metadata/_custom_type_script = "uid://dtfbuvijibmfx"

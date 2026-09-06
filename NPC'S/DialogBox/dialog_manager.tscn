@@ -4,5 +4,6 @@
 [ext_resource type="PackedScene" uid="uid://dn1l12ktryt3s" path="res://NPC'S/DialogBox/dialog_box.tscn" id="2_rltxh"]
 
 [node name="DialogManager" type="CanvasLayer" unique_id=241267555]
+process_mode = 3
 script = ExtResource("1_blryi")
 dialog_scene = ExtResource("2_rltxh")

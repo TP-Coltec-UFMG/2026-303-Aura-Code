@@ -76,8 +76,22 @@ func set_task_completed(index: int, completed: bool, animate: bool = false) -> v
 
 
 func complete_third_floor() -> void:
-	set_task_visible(3, true)
-	set_task_completed(3, true, true)
+	show_only_third_floor_task(true, true)
+
+
+func show_only_third_floor_task(completed: bool, animate: bool = false) -> void:
+	for index in range(rows.size()):
+		set_task_visible(index, index == 3)
+	set_task_text(3, "IR PARA O TERCEIRO ANDAR")
+	set_task_completed(3, completed, animate)
+	set_panel_visible(true)
+
+
+func show_talk_to_npc_task(completed: bool, animate: bool = false) -> void:
+	for index in range(rows.size()):
+		set_task_visible(index, index == 3)
+	set_task_text(3, "FALE COM O NPC")
+	set_task_completed(3, completed, animate)
 	set_panel_visible(true)
 
 
@@ -85,15 +99,18 @@ func refresh_saved_state() -> void:
 	var state := SaveGame.office_mission_state(get_parent() as Player)
 	var unlocked := bool(state.get("elevator_third_floor_unlocked", false))
 	var arrived := bool(state.get("arrived_third_floor", false))
+	var npc_ready := bool(state.get("office_npc_shout_finished", false))
+	var dialog_finished := bool(state.get("office_dialog_finished", false))
 	if unlocked:
 		set_task_completed(0, true)
 		set_task_completed(1, true)
-		set_task_visible(2, true)
 		set_task_completed(2, true)
-	set_task_visible(3, unlocked)
-	if unlocked:
-		set_task_completed(3, arrived)
-		set_panel_visible(true)
+		if npc_ready:
+			show_talk_to_npc_task(dialog_finished)
+		else:
+			show_only_third_floor_task(arrived)
+	else:
+		set_task_visible(3, false)
 
 
 func _notification(what: int) -> void:

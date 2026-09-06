@@ -138,18 +138,20 @@ func _liberar_elevador_terceiro() -> void:
 
 func _atualizar_tarefa_terceiro() -> void:
 	quest_ui.set_task_text(3, "IR PARA O TERCEIRO ANDAR")
-	quest_ui.set_task_visible(3, true)
-	quest_ui.set_task_completed(3, _chegou_terceiro_andar)
+	quest_ui.show_only_third_floor_task(_chegou_terceiro_andar)
 
 
 func _atualizar_linhas_tarefas() -> void:
+	if _elevador_terceiro_liberado:
+		_atualizar_tarefa_terceiro()
+		return
+	quest_ui.set_task_visible(0, true)
+	quest_ui.set_task_visible(1, true)
 	quest_ui.set_task_visible(2, _hide_scheduled)
 	if _hide_scheduled:
 		quest_ui.set_task_text(2, "ESPERE TODO MUNDO SAIR")
 		quest_ui.set_task_completed(2, _todos_sairam)
-	quest_ui.set_task_visible(3, _elevador_terceiro_liberado)
-	if _elevador_terceiro_liberado:
-		_atualizar_tarefa_terceiro()
+	quest_ui.set_task_visible(3, false)
 
 
 func _instanciar_indicador_final() -> void:

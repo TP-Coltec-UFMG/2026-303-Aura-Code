@@ -1,6 +1,9 @@
 class_name BaseScene
 extends Node
 
+const OFFICE_EMPTY_THOUGHT_ID: String = "office:empty_floor"
+const OFFICE_EMPTY_THOUGHT_DELAY: float = 6.0
+
 var player: Player = null
 
 @onready var entrance_markers: Node2D = $EntranceMarkers
@@ -119,12 +122,35 @@ func _registrar_chegada_escritorio() -> void:
 	if not get_tree().current_scene.scene_file_path.ends_with("andar_escritorio.tscn"):
 		return
 	var estado := SaveGame.office_mission_state(player)
-	if not bool(estado.get("elevator_third_floor_unlocked", false)) or bool(estado.get("arrived_third_floor", false)):
+	if not bool(estado.get("elevator_third_floor_unlocked", false)):
 		return
-	estado["arrived_third_floor"] = true
-	SaveGame.save_global_state("hall_quest_01", estado)
+	var primeira_chegada := not bool(estado.get("arrived_third_floor", false))
+	if primeira_chegada:
+		estado["arrived_third_floor"] = true
+		SaveGame.save_global_state("hall_quest_01", estado)
 	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
 	if quest_ui != null:
-		quest_ui.complete_third_floor()
+		if primeira_chegada:
+			quest_ui.complete_third_floor()
+		else:
+			quest_ui.show_only_third_floor_task(true)
+	var balao := player.balao_de_pensamento
+	var pensamento_novo: bool = not balao.tem_pensamento(OFFICE_EMPTY_THOUGHT_ID)
+	if pensamento_novo:
+		_agendar_pensamento_escritorio_vazio()
+	if player.checkpoint_enabled and primeira_chegada:
+		SaveGame.create_checkpoint(player)
+
+
+func _agendar_pensamento_escritorio_vazio() -> void:
+	await get_tree().create_timer(OFFICE_EMPTY_THOUGHT_DELAY, false).timeout
+	if not is_inside_tree() or not is_instance_valid(player):
+		return
+	if get_tree().current_scene != self:
+		return
+	var balao := player.balao_de_pensamento
+	if balao.tem_pensamento(OFFICE_EMPTY_THOUGHT_ID):
+		return
+	balao.enfileirar(OFFICE_EMPTY_THOUGHT_ID, "Cadê todo mundo?")
 	if player.checkpoint_enabled:
 		SaveGame.create_checkpoint(player)

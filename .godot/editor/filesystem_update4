@@ -1,3 +1,16 @@
 res://Player/ManPlayer.tscn
 res://shaders/pause_menu.gdshader
 res://Objects/extintor.tscn
+res://Scenes/andar_escritorio.tscn
+res://Scenes/iluminacao.gd
+res://Player/quest_mission_ui.gd
+res://Scenes/scripts/base_scene.gd
+res://Scenes/scripts/quest_mission.gd
+res://Tests/quest_panel_visibility.gd
+res://NPC'S/clarxs.gd
+res://NPC'S/Clarxs.tscn
+res://NPC'S/DialogBox/dialog_box.gd
+res://NPC'S/DialogBox/dialog_manager.gd
+res://Scenes/scripts/office_intro_controller.gd
+res://Scenes/scripts/pause_menu.gd
+res://Player/Scripts/player.gd

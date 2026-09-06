@@ -159,6 +159,17 @@ func load_checkpoint_state(checkpoint_state: Dictionary) -> void:
 	UpdateOccluderLight()
 
 func _physics_process(delta: float) -> void:
+	if DialogManager.is_showing_dialog:
+		direction = Vector2.ZERO
+		velocity = Vector2.ZERO
+		correndo = false
+		move_speed = VELOCIDADE_NORMAL
+		if state != "idle":
+			state = "idle"
+			UpdateAnimation()
+		_update_walking_sfx()
+		return
+
 	direction = Input.get_vector("left", "right", "up", "down")
 	
 	if objeto_manipulado != null:
@@ -442,6 +453,9 @@ func reset_sprite_player() -> void:
 	$Sprite2D.texture = preload("res://Player/Sprites/Alex_16x16.png")
 
 func _input(event: InputEvent) -> void:
+	if DialogManager.is_showing_dialog:
+		return
+
 	if event.is_action_pressed("use_lanterna") and inventory.get_item_on_inventary("lanterna"):
 		var lanterna = inventory.get_item_control("lanterna")
 		lanterna.set_player(self)

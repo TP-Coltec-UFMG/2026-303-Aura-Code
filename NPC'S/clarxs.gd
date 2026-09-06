@@ -1,12 +1,15 @@
 extends Node2D
 
 signal npc_saiu
+signal path_completed(path: NPCPath)
 
 
 @export_category("NPC")
 
 @export var sprite_sheet: Texture2D
 @export var dialog_texts: Array[String] = []
+@export var dialog_enabled: bool = true
+@export var dialog_id: String = ""
 @export var save_enabled: bool = true
 ## Vazio usa o caminho na cena. Defina um ID estável para NPCs gerados por código.
 @export var save_id: String = ""
@@ -76,7 +79,7 @@ var desperate_movement_type: int = NPCPath.MovementType.RUN
 var rng := RandomNumberGenerator.new()
 
 
-@onready var interaction_icon = $Clarxs
+@onready var interaction_icon: Label = $InteractionPrompt
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 
@@ -377,15 +380,19 @@ func add_frame_to_animation(
 
 
 func _process(delta: float) -> void:
+	_update_interaction_prompt()
+
 	if desperate:
 		update_desperate_movement(delta)
+		return
+
+	if current_path != null and not path_finished:
+		update_movement(delta)
 		return
 
 	if player_in_range and player_ref:
 		update_direction()
 		return
-
-	update_movement(delta)
 
 
 func update_movement(delta: float) -> void:
@@ -446,6 +453,7 @@ func go_to_next_path_point() -> void:
 	var finished_path: NPCPath = current_path
 
 	if finished_path.delete_npc_at_end:
+		path_completed.emit(finished_path)
 		if save_enabled:
 			SaveGame.mark_checkpoint_actor_removed(self)
 		npc_saiu.emit()
@@ -454,16 +462,19 @@ func go_to_next_path_point() -> void:
 
 	if finished_path.loop_path:
 		current_point = 0
+		path_completed.emit(finished_path)
 		return
 
 	if finished_path.random_at_end:
 		start_desperate_mode()
+		path_completed.emit(finished_path)
 		return
 
 	path_finished = true
 	current_point = -1
 
 	play_idle(last_direction)
+	path_completed.emit(finished_path)
 
 
 func start_desperate_mode() -> void:
@@ -616,13 +627,16 @@ func _unhandled_input(
 	event: InputEvent
 ) -> void:
 	if (
-		player_in_range
-		and event.is_action_pressed("ui_accept")
+		has_dialog()
+		and player_in_range
+		and (event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"))
 		and not DialogManager.is_showing_dialog
 	):
 		DialogManager.start_dialog(
-			dialog_texts
+			dialog_texts,
+			dialog_id
 		)
+		get_viewport().set_input_as_handled()
 
 
 func _on_area_2d_body_entered(body) -> void:
@@ -631,7 +645,7 @@ func _on_area_2d_body_entered(body) -> void:
 
 		player_ref = body
 
-		interaction_icon.visible = true
+		interaction_icon.visible = has_dialog()
 
 
 func _on_area_2d_body_exited(body) -> void:
@@ -641,6 +655,23 @@ func _on_area_2d_body_exited(body) -> void:
 		player_ref = null
 
 		interaction_icon.visible = false
+
+
+func set_dialog_enabled(value: bool) -> void:
+	dialog_enabled = value
+	interaction_icon.visible = has_dialog() and player_in_range
+
+
+func has_dialog() -> bool:
+	return dialog_enabled and not dialog_texts.is_empty()
+
+
+func _update_interaction_prompt() -> void:
+	interaction_icon.visible = (
+		has_dialog()
+		and player_in_range
+		and not DialogManager.is_showing_dialog
+	)
 
 
 func update_direction() -> void:

@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dy03jegfblbn0" path="res://NPC'S/NPC/AlexSide.png" id="3_0ouef"]
 [ext_resource type="Texture2D" uid="uid://cafijwft0ela2" path="res://NPC'S/NPC/06_purple_crimson.png" id="3_23wyb"]
 [ext_resource type="FontFile" uid="uid://e6o7s3fomjpp" path="res://Fonts/PixelifySans-SemiBold.ttf" id="4_0ouef"]
+[ext_resource type="PackedScene" path="res://NPC'S/BalaoDeFalaNPC.tscn" id="5_balloon"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_23wyb"]
 atlas = ExtResource("2_aekyl")
@@ -309,6 +310,9 @@ animations = [{
 radius = 2.0
 height = 4.0
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_dialog"]
+radius = 24.0
+
 [node name="NPC1" type="Node2D" unique_id=406687579]
 script = ExtResource("1_aekyl")
 
@@ -317,21 +321,33 @@ sprite_frames = SubResource("SpriteFrames_g4v7s")
 animation = &"run_up"
 autoplay = "idle_down"
 
-[node name="Clarxs" type="Label" parent="." unique_id=1789373355]
+[node name="InteractionPrompt" type="Label" parent="." unique_id=1789373355]
 visible = false
-offset_left = -26.0
+offset_left = -45.0
 offset_top = -27.0
-offset_right = 27.0
+offset_right = 45.0
 offset_bottom = -4.0
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("4_0ouef")
 theme_override_font_sizes/font_size = 8
-text = "Clarxs"
+text = "ESPAÇO: FALAR"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="BalaoDePensamento" parent="." unique_id=1981370232 instance=ExtResource("5_balloon")]
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1344402819]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=278775730]
 position = Vector2(0, -4)
 shape = SubResource("CapsuleShape2D_57qmd")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1256157230]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=502931541]
+position = Vector2(0, -4)
+shape = SubResource("CircleShape2D_dialog")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]

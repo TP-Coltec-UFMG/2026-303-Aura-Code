@@ -314,6 +314,8 @@ func pause():
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("esc"):
+		if DialogManager.is_showing_dialog:
+			return
 		if get_tree().paused:
 			resume()
 		else:

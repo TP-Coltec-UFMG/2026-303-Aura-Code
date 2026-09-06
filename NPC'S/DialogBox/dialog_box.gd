@@ -26,7 +26,7 @@ func _ready() -> void:
 		0.3
 	).set_trans(Tween.TRANS_BACK)
 
-func show_text():
+func show_text() -> void:
 	if current_index < texts_to_display.size():
 		is_typing = true
 		skip_typing = false
@@ -37,7 +37,7 @@ func show_text():
 	else:
 		_close_dialog()
 
-func _type_text(text: String):
+func _type_text(text: String) -> void:
 	for i in range(text.length()):
 		if skip_typing:
 			text_label.text = text
@@ -48,7 +48,6 @@ func _type_text(text: String):
 
 	is_typing = false
 	indicator.visible = true
-	get_tree().paused = true
 
 func _close_dialog():
 	is_typing = true
@@ -66,14 +65,11 @@ func _close_dialog():
 	dialog_finished.emit()
 	queue_free()
 
-func _unhandled_input(event):
-	if event.is_action_pressed("ui_accept"):
-		if is_typing:
-			skip_typing = true
-		else:
-			if current_index + 1 < texts_to_display.size():
-				current_index += 1
-				show_text()
-			else:
-				get_tree().paused = false
-				_close_dialog()
+func advance() -> void:
+	if is_typing:
+		skip_typing = true
+	elif current_index + 1 < texts_to_display.size():
+		current_index += 1
+		show_text()
+	else:
+		_close_dialog()

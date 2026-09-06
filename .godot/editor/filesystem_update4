@@ -1,11 +1,3 @@
+res://Scenes/scripts/pause_menu.gd
 res://Player/ManPlayer.tscn
-res://Player/balao_de_pensamento.gd
-res://Player/Scripts/player.gd
-res://Scenes/andar_hall.tscn
-res://Scenes/scripts/quest_mission.gd
-res://Interaction_components/interactiong_component.tscn
-res://Scripts/Data/save/SaveGame.gd
-res://Scenes/line_2d.gd
-res://Scripts/Objects/Label/fps_label.gd
-res://Objects/extintor.tscn
-res://Objects/scripts/extintor.gd
+res://Scenes/principal.tscn

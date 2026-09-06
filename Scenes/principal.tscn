@@ -65,6 +65,7 @@ script/source = "extends Node2D
 @onready var transition: AnimatedSprite2D = $Transition
 @onready var primeira_vez: Node2D = $PrimeiraVez
 @onready var new_game_button: Button = $\"Menu Inicial/VContainer/NewGameButton\"
+var reset_confirmation: Control
 
 
 var scene_to_change_path: String
@@ -92,6 +93,7 @@ func _ready() -> void:
 		primeira_vez.visible = false
 
 	atualizar_botao_jogo()
+	_configurar_novo_jogo()
 
 	var interface_index: int = int(Configs.configs.get(\"interface_size\", 0))
 	call_deferred(\"aplicar_tamanho_interface_por_index\", interface_index)
@@ -375,6 +377,60 @@ func atualizar_botao_jogo() -> void:
 		new_game_button.text = \"CONTINUAR\"
 	else:
 		new_game_button.text = \"NOVO JOGO\"
+
+func _configurar_novo_jogo() -> void:
+	if not SaveGame.has_checkpoint():
+		return
+	var container := new_game_button.get_parent() as VBoxContainer
+	var row := HBoxContainer.new()
+	row.name = \"ContinueRow\"
+	container.add_child(row)
+	container.move_child(row, new_game_button.get_index())
+	container.remove_child(new_game_button)
+	row.add_child(new_game_button)
+	var botao_scene: PackedScene = load(\"res://Scenes/Utils/animated_button.tscn\") as PackedScene
+	var novo: Button = botao_scene.instantiate() as Button
+	novo.name = \"NovoJogoButton\"
+	novo.text = \"NOVO JOGO\"
+	novo.scale = Vector2(0.72, 0.72)
+	novo.hover_scale = Vector2(0.792, 0.792)
+	novo.press_scale = Vector2(0.684, 0.684)
+	novo.modulate = Color(1, 1, 1, 0.5)
+	novo.mouse_entered.connect(Callable(self, \"_novo_jogo_mouse_entered\").bind(novo))
+	novo.mouse_exited.connect(Callable(self, \"_novo_jogo_mouse_exited\").bind(novo))
+	novo.pressed.connect(_on_novo_jogo_pressed)
+	row.add_child(novo)
+	var morte_scene: PackedScene = load(\"res://TelaMorte/morreu.tscn\") as PackedScene
+	var morte: Control = morte_scene.instantiate() as Control
+	add_child(morte)
+	reset_confirmation = morte.get_node(\"Confirmacao_reiniciar\") as Control
+	morte.remove_child(reset_confirmation)
+	morte.queue_free()
+	add_child(reset_confirmation)
+	reset_confirmation.hide()
+	var botao_sim := reset_confirmation.get_node(\"sim\") as Control
+	var botao_nao := reset_confirmation.get_node(\"nao\") as Control
+	botao_sim.position.y += 40.0
+	botao_nao.position.y += 40.0
+	botao_sim.pressed.connect(_confirmar_novo_jogo)
+	botao_nao.pressed.connect(_cancelar_novo_jogo)
+
+func _on_novo_jogo_pressed() -> void:
+	if is_instance_valid(reset_confirmation):
+		reset_confirmation.show()
+
+func _novo_jogo_mouse_entered(button: Button) -> void:
+	button.modulate.a = 1.0
+
+func _novo_jogo_mouse_exited(button: Button) -> void:
+	button.modulate.a = 0.5
+
+func _confirmar_novo_jogo() -> void:
+	SaveGame.reset_progress()
+
+func _cancelar_novo_jogo() -> void:
+	if is_instance_valid(reset_confirmation):
+		reset_confirmation.hide()
 		
 func _on_new_game_button_pressed() -> void:
 	transition.play(\"default\")

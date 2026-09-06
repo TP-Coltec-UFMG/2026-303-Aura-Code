@@ -330,7 +330,8 @@ func _on_resume_pressed() -> void:
 func _on_restart_pressed() -> void:
 	if get_tree().paused:
 		resume()
-		SaveGame.reset_progress()
+		# Resetar no pause volta ao último checkpoint; o reset completo fica no menu principal.
+		SaveGame.load_last_checkpoint()
 
 
 func _on_options_pressed() -> void:

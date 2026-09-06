@@ -118,11 +118,10 @@ func _run() -> void:
 	_check(dialog_box.text_label.text == dialog_box.texts_to_display[0] and not dialog_box.is_typing, "segunda entrada real de Espaço completa o texto")
 	await _send_key(KEY_ESCAPE)
 	_check(not get_tree().paused and DialogManager.is_showing_dialog, "Esc não abre o menu de pausa durante o diálogo")
-	await _send_key(KEY_SPACE)
-	await _send_key(KEY_SPACE)
-	await _send_key(KEY_SPACE)
-	await _send_key(KEY_SPACE)
-	await _send_key(KEY_SPACE)
+	var input_safety_limit := 30
+	while DialogManager.is_showing_dialog and input_safety_limit > 0:
+		await _send_key(KEY_SPACE)
+		input_safety_limit -= 1
 	await get_tree().create_timer(0.4).timeout
 	_check(not DialogManager.is_showing_dialog and not get_tree().paused, "Espaço avança todas as falas e fecha o diálogo normalmente")
 	_check(bool(SaveGame.office_mission_state().get("office_dialog_finished", false)), "conversa concluída é salva")

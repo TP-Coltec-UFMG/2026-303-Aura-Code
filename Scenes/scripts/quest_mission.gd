@@ -1,18 +1,9 @@
-extends CanvasLayer
+extends Node
 
 @export var save_id: String = "hall_quest_01"
 
-@onready var M2: AnimatedSprite2D = (
-	$VBoxContainer/HBoxContainer/AnimatedSprite2D
-)
-@onready var M1: AnimatedSprite2D = (
-	$VBoxContainer/HBoxContainer2/AnimatedSprite2D
-)
-@onready var M3: AnimatedSprite2D = $VBoxContainer/HBoxContainer3/AnimatedSprite2D
-@onready var M4: AnimatedSprite2D = $VBoxContainer/HBoxContainer4/AnimatedSprite2D
-
-
 var man_player: Player
+var quest_ui: QuestMissionUI
 var _inicializado: bool = false
 signal orientacao_elevador_iniciada
 signal pensamento_extintor_iniciado
@@ -35,22 +26,7 @@ var _evacuacao_ativa: bool = false
 var _elevador_terceiro_liberado: bool = false
 var _chegou_terceiro_andar: bool = false
 
-
-
-func _notification(what: int) -> void:
-	match what:
-		NOTIFICATION_PAUSED:
-			$"../UI/Controle_de_tempo".hide()
-			hide()
-
-		NOTIFICATION_UNPAUSED:
-			$"../UI/Controle_de_tempo".show()
-
-			_atualizar_visibilidade()
-
-
 func _ready() -> void:
-	hide()
 	# BaseScene escolhe o Player persistente e aplica o checkpoint no _ready.
 	call_deferred("_inicializar")
 
@@ -59,7 +35,10 @@ func _inicializar() -> void:
 	man_player = get_parent().player as Player
 	if not is_instance_valid(man_player):
 		return
-
+	quest_ui = man_player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
+	if not is_instance_valid(quest_ui):
+		push_error("Player sem o painel QUEST_MISSION.")
+		return
 	_restore_progress()
 	_apply_saved_visuals()
 	_atualizar_linhas_tarefas()
@@ -116,10 +95,10 @@ func _descartar_instrucoes_obsoletas() -> void:
 
 
 func _atualizar_visibilidade() -> void:
-	if not is_inside_tree() or is_queued_for_deletion() or not _inicializado or get_tree().paused:
+	if not is_inside_tree() or is_queued_for_deletion() or not _inicializado or not is_instance_valid(quest_ui):
 		return
 	var balao = man_player.balao_de_pensamento
-	visible = (
+	quest_ui.set_panel_visible(
 		balao.foi_concluido(_pensamento_id("intro_2"))
 		or _hide_scheduled
 		or _elevador_terceiro_liberado
@@ -158,30 +137,17 @@ func _liberar_elevador_terceiro() -> void:
 
 
 func _atualizar_tarefa_terceiro() -> void:
-	var linha := $VBoxContainer/HBoxContainer4
-	var texto := linha.get_node("Label3") as Label
-	texto.text = "IR PARA O TERCEIRO ANDAR"
-	linha.show()
-	if _chegou_terceiro_andar:
-		_set_completed_frame(M4)
-	else:
-		M4.stop()
-		M4.animation = &"default"
-		M4.frame = 0
+	quest_ui.set_task_text(3, "IR PARA O TERCEIRO ANDAR")
+	quest_ui.set_task_visible(3, true)
+	quest_ui.set_task_completed(3, _chegou_terceiro_andar)
 
 
 func _atualizar_linhas_tarefas() -> void:
-	var linha_saida := $VBoxContainer/HBoxContainer3
-	linha_saida.visible = _hide_scheduled
+	quest_ui.set_task_visible(2, _hide_scheduled)
 	if _hide_scheduled:
-		linha_saida.get_node("Label3").text = "ESPERE TODO MUNDO SAIR"
-		if _todos_sairam:
-			_set_completed_frame(M3)
-		else:
-			M3.stop()
-			M3.animation = &"default"
-			M3.frame = 0
-	$VBoxContainer/HBoxContainer4.visible = _elevador_terceiro_liberado
+		quest_ui.set_task_text(2, "ESPERE TODO MUNDO SAIR")
+		quest_ui.set_task_completed(2, _todos_sairam)
+	quest_ui.set_task_visible(3, _elevador_terceiro_liberado)
 	if _elevador_terceiro_liberado:
 		_atualizar_tarefa_terceiro()
 
@@ -242,7 +208,7 @@ func _on_area_2d_body_entered(body: Node2D) -> void:
 		return
 
 	M2_feito = true
-	M2.play(&"default")
+	quest_ui.set_task_completed(1, true, true)
 
 	if not M1_feito:
 		_pensar("aviso_1", "Tenho que apagar todos os fogos!")
@@ -266,7 +232,7 @@ func _update_fire_task() -> void:
 		return
 
 	M1_feito = true
-	M1.play(&"default")
+	quest_ui.set_task_completed(0, true, true)
 
 	if not M2_feito:
 		_pensar("pedras", "Só preciso tirar essas pedras do caminho!")
@@ -329,16 +295,12 @@ func _start_npc_exit_paths(legacy_restore: bool = false) -> void:
 
 
 func _iniciar_espera_npcs() -> void:
-	$VBoxContainer/HBoxContainer3.show()
+	quest_ui.set_task_visible(2, true)
 	if _todos_sairam:
 		_concluir_saida_depois_da_animacao(null)
 		return
-	$VBoxContainer/HBoxContainer3/Label3.text = "ESPERE TODO MUNDO SAIR"
-	M3.stop()
-	M3.animation = &"default"
-	M3.frame = 0
-	M3.frame_progress = 0.0
-	$VBoxContainer/HBoxContainer3.show()
+	quest_ui.set_task_text(2, "ESPERE TODO MUNDO SAIR")
+	quest_ui.set_task_completed(2, false)
 	var npcs := get_node_or_null("../NPCs")
 	_saida_pendente = 0
 	_evacuacao_ativa = true
@@ -369,8 +331,8 @@ func _concluir_saida_npcs() -> void:
 		return
 	_todos_sairam = true
 	_evacuacao_ativa = false
-	M3.play("default")
-	_concluir_saida_depois_da_animacao(M3)
+	quest_ui.set_task_completed(2, true, true)
+	_concluir_saida_depois_da_animacao(quest_ui.markers[2])
 
 
 func _concluir_saida_depois_da_animacao(marcador: AnimatedSprite2D) -> void:
@@ -472,32 +434,7 @@ func _is_saved_fire_extinguished(fire_save_id: String) -> bool:
 
 
 func _apply_saved_visuals() -> void:
-	M1.stop()
-	M2.stop()
-	M3.stop()
-	M4.stop()
-
-	M1.frame = 0
-	M2.frame = 0
-
-	if M1_feito:
-		_set_completed_frame(M1)
-
-	if M2_feito:
-		_set_completed_frame(M2)
-	if _todos_sairam:
-		_set_completed_frame(M3)
-	if _chegou_terceiro_andar:
-		_set_completed_frame(M4)
-
-
-func _set_completed_frame(marker: AnimatedSprite2D) -> void:
-	if marker.sprite_frames == null:
-		return
-
-	var frame_count := marker.sprite_frames.get_frame_count(
-		&"default"
-	)
-
-	marker.animation = &"default"
-	marker.frame = maxi(frame_count - 1, 0)
+	quest_ui.set_task_completed(0, M1_feito)
+	quest_ui.set_task_completed(1, M2_feito)
+	quest_ui.set_task_completed(2, _todos_sairam)
+	quest_ui.set_task_completed(3, _chegou_terceiro_andar)

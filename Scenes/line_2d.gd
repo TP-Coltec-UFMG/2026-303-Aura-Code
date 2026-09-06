@@ -6,7 +6,7 @@ const DURACAO_INDICADOR: float = 10.0
 
 @export var ciclo_final: bool = false
 
-var _quest: CanvasLayer
+var _quest: Node
 var _temporizador: Timer
 var _tempo_restante: float = DURACAO_INDICADOR
 
@@ -46,9 +46,9 @@ func _ready() -> void:
 func _conectar_quest() -> void:
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
-	_quest = get_tree().current_scene.get_node_or_null("QUEST_MISSION") as CanvasLayer
+	_quest = get_tree().current_scene.get_node_or_null("QuestController")
 	if _quest == null:
-		push_warning("Borda do elevador sem QUEST_MISSION na cena.")
+		push_warning("Borda do elevador sem QuestController na cena.")
 		return
 	if not _quest.orientacao_elevador_iniciada.is_connected(_sincronizar):
 		_quest.orientacao_elevador_iniciada.connect(_sincronizar)

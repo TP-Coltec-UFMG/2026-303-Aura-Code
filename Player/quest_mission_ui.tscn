@@ -1,0 +1,99 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Player/quest_mission_ui.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://4u0s2rx02af5" path="res://Fonts/PixelifySans-Medium.ttf" id="2"]
+[ext_resource type="Texture2D" uid="uid://bnat7qx6txmu4" path="res://Sprites/ui/New_Piskel.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://ilqnqop4tga7" path="res://Sprites/ui/New_Piskel1.png" id="4"]
+
+[sub_resource type="LabelSettings" id="LabelSettingsTitle"]
+font = ExtResource("2")
+font_size = 10
+outline_size = 1
+
+[sub_resource type="LabelSettings" id="LabelSettingsTask"]
+font = ExtResource("2")
+font_size = 7
+
+[sub_resource type="SpriteFrames" id="SpriteFramesCheck"]
+animations = [{
+"frames": [{"duration": 1.0, "texture": ExtResource("3")}, {"duration": 1.0, "texture": ExtResource("4")}],
+"loop": false,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="QUEST_MISSION" type="CanvasLayer" groups=["alto_contraste"]]
+script = ExtResource("1")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = 374.0
+offset_top = 35.0
+offset_right = 480.0
+offset_bottom = 108.0
+color = Color(0.094685, 0.094685, 0.094685, 1)
+
+[node name="Label2" type="Label" parent="." groups=["alto_contraste"]]
+offset_left = 410.0
+offset_top = 37.0
+offset_right = 451.0
+offset_bottom = 50.0
+text = "TAREFAS"
+label_settings = SubResource("LabelSettingsTitle")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -90.0
+offset_top = -84.0
+offset_right = 20.0
+offset_bottom = -6.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/separation = 5
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer2" groups=["alto_contraste"]]
+layout_mode = 2
+text = "APAGUE O FOGO"
+label_settings = SubResource("LabelSettingsTask")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer2"]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFramesCheck")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer" groups=["alto_contraste"]]
+layout_mode = 2
+text = "LIBERE O ELEVADOR"
+label_settings = SubResource("LabelSettingsTask")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer"]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFramesCheck")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer3" groups=["alto_contraste"]]
+layout_mode = 2
+text = "ESPERE TODO MUNDO SAIR"
+label_settings = SubResource("LabelSettingsTask")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer3"]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFramesCheck")
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer4" groups=["alto_contraste"]]
+layout_mode = 2
+text = "IR PARA O TERCEIRO ANDAR"
+label_settings = SubResource("LabelSettingsTask")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer4"]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFramesCheck")

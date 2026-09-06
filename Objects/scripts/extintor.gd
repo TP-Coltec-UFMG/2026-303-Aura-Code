@@ -67,7 +67,7 @@ func _ready() -> void:
 func _conectar_indicador() -> void:
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
-	var quest := get_node_or_null("../../QUEST_MISSION")
+	var quest := get_tree().current_scene.get_node_or_null("QuestController")
 	if quest == null or not quest.has_signal("pensamento_extintor_iniciado"):
 		return
 	if not quest.pensamento_extintor_iniciado.is_connected(_iniciar_indicador):

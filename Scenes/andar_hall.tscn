@@ -28,12 +28,9 @@
 [ext_resource type="PackedScene" uid="uid://hloe5jawmgui" path="res://Scenes/pause_menu.tscn" id="17_ysydw"]
 [ext_resource type="Texture2D" uid="uid://cgntmak4t0bga" path="res://NPC'S/NPC/boneco_1.png" id="18_4bo1l"]
 [ext_resource type="Script" uid="uid://778gwebo6sfc" path="res://Scenes/scripts/quest_mission.gd" id="18_h0r3n"]
-[ext_resource type="FontFile" uid="uid://4u0s2rx02af5" path="res://Fonts/PixelifySans-Medium.ttf" id="18_pfqqk"]
 [ext_resource type="Texture2D" uid="uid://7dxb4evip3l1" path="res://NPC'S/NPC/04_silver_orange.png" id="19_kws21"]
-[ext_resource type="Texture2D" uid="uid://bnat7qx6txmu4" path="res://Sprites/ui/New_Piskel.png" id="19_xl0vw"]
 [ext_resource type="Texture2D" uid="uid://cxyejmrimb2dj" path="res://NPC'S/NPC/boneco_2.png" id="20_m7e8o"]
 [ext_resource type="Script" uid="uid://b6ktgxyvib1et" path="res://Scenes/scripts/ui.gd" id="20_vkln7"]
-[ext_resource type="Texture2D" uid="uid://ilqnqop4tga7" path="res://Sprites/ui/New_Piskel1.png" id="20_xodlo"]
 [ext_resource type="Texture2D" uid="uid://c0ciw10r6huss" path="res://NPC'S/NPC/boneco_3.png" id="22_pjvw7"]
 [ext_resource type="Texture2D" uid="uid://sk6715ex5eom" path="res://NPC'S/NPC/pessoa_2.png" id="23_4bo1l"]
 [ext_resource type="Texture2D" uid="uid://kv52um6c31r" path="res://NPC'S/NPC/boneco_5.png" id="23_ohpjp"]
@@ -144,29 +141,6 @@ animations = [{
 "loop": 0,
 "name": &"default",
 "speed": 20.0
-}]
-
-[sub_resource type="LabelSettings" id="LabelSettings_g4v7s"]
-font = ExtResource("18_pfqqk")
-font_size = 10
-outline_size = 1
-
-[sub_resource type="LabelSettings" id="LabelSettings_xl0vw"]
-font = ExtResource("18_pfqqk")
-font_size = 7
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_g4v7s"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("19_xl0vw")
-}, {
-"duration": 1.0,
-"texture": ExtResource("20_xodlo")
-}],
-"loop": 0,
-"name": &"default",
-"speed": 5.0
 }]
 
 [node name="andar_hall" type="Node2D" unique_id=1272659551]
@@ -810,98 +784,8 @@ scale = Vector2(1.25, 1.2500001)
 sprite_frames = SubResource("SpriteFrames_vkln7")
 frame = 7
 
-[node name="QUEST_MISSION" type="CanvasLayer" parent="." unique_id=1686386730 groups=["alto_contraste"]]
+[node name="QuestController" type="Node" parent="." unique_id=856587055]
 script = ExtResource("18_h0r3n")
-
-[node name="ColorRect" type="ColorRect" parent="QUEST_MISSION" unique_id=896148046]
-offset_left = 374.0
-offset_top = 35.0
-offset_right = 480.0
-offset_bottom = 108.0
-color = Color(0.094684996, 0.09468501, 0.09468501, 1)
-
-[node name="Label2" type="Label" parent="QUEST_MISSION" unique_id=623343459 groups=["alto_contraste"]]
-offset_left = 410.0
-offset_top = 37.0
-offset_right = 451.0
-offset_bottom = 50.0
-text = "TAREFAS"
-label_settings = SubResource("LabelSettings_g4v7s")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="QUEST_MISSION" unique_id=2030489717]
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -90.0
-offset_top = -84.0
-offset_right = 20.0
-offset_bottom = -6.0
-grow_horizontal = 0
-grow_vertical = 2
-theme_override_constants/separation = 5
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="QUEST_MISSION/VBoxContainer" unique_id=666895531]
-layout_mode = 2
-
-[node name="Label3" type="Label" parent="QUEST_MISSION/VBoxContainer/HBoxContainer2" unique_id=76649463 groups=["alto_contraste"]]
-layout_mode = 2
-text = "APAGUE O FOGO"
-label_settings = SubResource("LabelSettings_xl0vw")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="QUEST_MISSION/VBoxContainer/HBoxContainer2" unique_id=2136747803]
-position = Vector2(-8, 6)
-scale = Vector2(0.5, 0.5)
-sprite_frames = SubResource("SpriteFrames_g4v7s")
-frame = 1
-frame_progress = 1.0
-
-[node name="HBoxContainer" type="HBoxContainer" parent="QUEST_MISSION/VBoxContainer" unique_id=1178570110]
-layout_mode = 2
-
-[node name="Label3" type="Label" parent="QUEST_MISSION/VBoxContainer/HBoxContainer" unique_id=1149265948 groups=["alto_contraste"]]
-layout_mode = 2
-text = "LIBERE O ELEVADOR"
-label_settings = SubResource("LabelSettings_xl0vw")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="QUEST_MISSION/VBoxContainer/HBoxContainer" unique_id=269822958]
-position = Vector2(-8, 6)
-scale = Vector2(0.5, 0.5)
-sprite_frames = SubResource("SpriteFrames_g4v7s")
-frame = 1
-frame_progress = 1.0
-
-[node name="HBoxContainer3" type="HBoxContainer" parent="QUEST_MISSION/VBoxContainer" unique_id=1312429330]
-layout_mode = 2
-
-[node name="Label3" type="Label" parent="QUEST_MISSION/VBoxContainer/HBoxContainer3" unique_id=1128449921 groups=["alto_contraste"]]
-layout_mode = 2
-text = "ESPERE TODO MUNDO SAIR"
-label_settings = SubResource("LabelSettings_xl0vw")
-vertical_alignment = 1
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="QUEST_MISSION/VBoxContainer/HBoxContainer3" unique_id=1848871589]
-position = Vector2(-8, 6)
-scale = Vector2(0.5, 0.5)
-sprite_frames = SubResource("SpriteFrames_g4v7s")
-frame = 1
-frame_progress = 1.0
-
-[node name="HBoxContainer4" type="HBoxContainer" parent="QUEST_MISSION/VBoxContainer" unique_id=1536119382]
-layout_mode = 2
-
-[node name="Label3" type="Label" parent="QUEST_MISSION/VBoxContainer/HBoxContainer4" unique_id=1067672460 groups=["alto_contraste"]]
-layout_mode = 2
-text = "IR PARA O TERCEIRO ANDAR"
-label_settings = SubResource("LabelSettings_xl0vw")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="QUEST_MISSION/VBoxContainer/HBoxContainer4" unique_id=1582919793]
-position = Vector2(-8, 6)
-scale = Vector2(0.5, 0.5)
-sprite_frames = SubResource("SpriteFrames_g4v7s")
-frame = 1
-frame_progress = 1.0
 
 [node name="Pedaco2" type="Sprite2D" parent="." unique_id=936507080]
 position = Vector2(-129, -85)
@@ -923,8 +807,8 @@ position = Vector2(-77.000015, -46)
 rotation = -0.76281595
 texture = ExtResource("8_vkln7")
 
-[connection signal="fogo_apagou" from="Perigos/Fogo3" to="QUEST_MISSION" method="_on_fogo_3_fogo_apagou"]
-[connection signal="fogo_apagou" from="Perigos/Fogo5" to="QUEST_MISSION" method="_on_fogo_5_fogo_apagou"]
-[connection signal="fogo_apagou" from="Perigos/Fogo6" to="QUEST_MISSION" method="_on_fogo_6_fogo_apagou"]
+[connection signal="fogo_apagou" from="Perigos/Fogo3" to="QuestController" method="_on_fogo_3_fogo_apagou"]
+[connection signal="fogo_apagou" from="Perigos/Fogo5" to="QuestController" method="_on_fogo_5_fogo_apagou"]
+[connection signal="fogo_apagou" from="Perigos/Fogo6" to="QuestController" method="_on_fogo_6_fogo_apagou"]
 [connection signal="jogador_morreu" from="ManPlayer" to="UI/Controle_de_tempo" method="_on_man_player_jogador_morreu"]
-[connection signal="body_entered" from="UI/Area2D" to="QUEST_MISSION" method="_on_area_2d_body_entered"]
+[connection signal="body_entered" from="UI/Area2D" to="QuestController" method="_on_area_2d_body_entered"]

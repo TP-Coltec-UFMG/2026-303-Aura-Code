@@ -9,11 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://c46ktfchhqx7n" path="res://Objects/painel_elevador.tscn" id="8_eb2mc"]
 [ext_resource type="PackedScene" uid="uid://bq87gqp7mwrnh" path="res://Interaction_components/interectable.tscn" id="10_ekofs"]
 [ext_resource type="PackedScene" uid="uid://destem3uvhbqo" path="res://Objects/controle_de_tempo.tscn" id="10_wvila"]
-[ext_resource type="Script" uid="uid://l0i8nx14vdie" path="res://Scenes/quest_mission_andar_escritorio.gd" id="11_pondc"]
 [ext_resource type="PackedScene" uid="uid://hloe5jawmgui" path="res://Scenes/pause_menu.tscn" id="11_vhcpt"]
-[ext_resource type="FontFile" uid="uid://4u0s2rx02af5" path="res://Fonts/PixelifySans-Medium.ttf" id="12_eo3of"]
-[ext_resource type="Texture2D" uid="uid://bnat7qx6txmu4" path="res://Sprites/ui/New_Piskel.png" id="13_hydi7"]
-[ext_resource type="Texture2D" uid="uid://ilqnqop4tga7" path="res://Sprites/ui/New_Piskel1.png" id="14_oq0xy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g4v7s"]
 size = Vector2(11, 17)
@@ -26,29 +22,6 @@ size = Vector2(11, 17)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iqkel"]
 size = Vector2(11, 18)
-
-[sub_resource type="LabelSettings" id="LabelSettings_b3g1w"]
-font = ExtResource("12_eo3of")
-font_size = 10
-outline_size = 1
-
-[sub_resource type="LabelSettings" id="LabelSettings_ai74j"]
-font = ExtResource("12_eo3of")
-font_size = 7
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_b5dyd"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("13_hydi7")
-}, {
-"duration": 1.0,
-"texture": ExtResource("14_oq0xy")
-}],
-"loop": 0,
-"name": &"default",
-"speed": 5.0
-}]
 
 [node name="andar_escritorio" type="Node2D" unique_id=1272659551]
 script = ExtResource("1_aes5c")
@@ -149,48 +122,3 @@ scene_trigger = NodePath("../SceneTrigger2")
 
 [node name="PauseMenu" parent="UI" unique_id=365074401 instance=ExtResource("11_vhcpt")]
 process_physics_priority = -6
-
-[node name="QUEST_MISSION" type="CanvasLayer" parent="." unique_id=582304828 groups=["alto_contraste"]]
-script = ExtResource("11_pondc")
-
-[node name="ColorRect" type="ColorRect" parent="QUEST_MISSION" unique_id=1015176733]
-offset_left = 374.0
-offset_top = 35.0
-offset_right = 480.0
-offset_bottom = 108.0
-color = Color(0.094684996, 0.09468501, 0.09468501, 1)
-
-[node name="Label2" type="Label" parent="QUEST_MISSION" unique_id=598192279 groups=["alto_contraste"]]
-offset_left = 410.0
-offset_top = 37.0
-offset_right = 451.0
-offset_bottom = 50.0
-text = "TAREFAS"
-label_settings = SubResource("LabelSettings_b3g1w")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="QUEST_MISSION" unique_id=438657807]
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -90.0
-offset_top = -84.0
-offset_right = 20.0
-offset_bottom = -6.0
-grow_horizontal = 0
-grow_vertical = 2
-theme_override_constants/separation = 5
-
-[node name="HBoxContainer4" type="HBoxContainer" parent="QUEST_MISSION/VBoxContainer" unique_id=1710459513]
-layout_mode = 2
-
-[node name="Label3" type="Label" parent="QUEST_MISSION/VBoxContainer/HBoxContainer4" unique_id=1312319734 groups=["alto_contraste"]]
-layout_mode = 2
-text = "IR PARA O TERCEIRO ANDAR"
-label_settings = SubResource("LabelSettings_ai74j")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="QUEST_MISSION/VBoxContainer/HBoxContainer4" unique_id=1712737051]
-position = Vector2(-8, 6)
-scale = Vector2(0.5, 0.5)
-sprite_frames = SubResource("SpriteFrames_b5dyd")

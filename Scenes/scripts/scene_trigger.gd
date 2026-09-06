@@ -134,16 +134,21 @@ func elevador_liberado() -> bool:
 
 
 func _ocultar_paineis_tarefas() -> void:
-	for nome in [&"QUEST_MISSION", &"OfficeMission"]:
-		var painel := get_tree().current_scene.get_node_or_null(String(nome)) as CanvasLayer
-		if painel != null:
-			painel.hide()
+	var painel := _obter_painel_tarefas()
+	if painel != null:
+		painel.hide_during_elevator()
 
 
 func _mostrar_paineis_tarefas() -> void:
-	for nome in [&"QUEST_MISSION", &"OfficeMission"]:
-		var painel := get_tree().current_scene.get_node_or_null(String(nome)) as CanvasLayer
-		if painel != null and painel.has_method("_atualizar_visibilidade"):
-			painel.call("_atualizar_visibilidade")
-		elif painel != null and painel.has_method("atualizar"):
-			painel.call("atualizar", body_p)
+	var painel := _obter_painel_tarefas()
+	if painel != null:
+		painel.restore_after_elevator()
+
+
+func _obter_painel_tarefas() -> QuestMissionUI:
+	var jogador := body_p
+	if not is_instance_valid(jogador):
+		jogador = get_tree().get_first_node_in_group("player") as Player
+	if not is_instance_valid(jogador):
+		return null
+	return jogador.get_node_or_null("QUEST_MISSION") as QuestMissionUI

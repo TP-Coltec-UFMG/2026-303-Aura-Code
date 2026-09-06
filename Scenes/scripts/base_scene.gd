@@ -123,5 +123,8 @@ func _registrar_chegada_escritorio() -> void:
 		return
 	estado["arrived_third_floor"] = true
 	SaveGame.save_global_state("hall_quest_01", estado)
+	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
+	if quest_ui != null:
+		quest_ui.complete_third_floor()
 	if player.checkpoint_enabled:
 		SaveGame.create_checkpoint(player)

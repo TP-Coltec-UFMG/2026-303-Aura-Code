@@ -27,7 +27,7 @@ func settle():
 	scene = get_tree().current_scene
 	p = scene.player
 	b = p.balao_de_pensamento
-	q = scene.get_node_or_null("QUEST_MISSION")
+	q = scene.get_node_or_null("QuestController")
 
 func reload_checkpoint():
 	check(SaveGame.load_last_checkpoint(), "checkpoint load accepted")
@@ -72,7 +72,7 @@ func run_test():
 	await get_tree().scene_changed
 	await settle()
 	gate_check("elevator blocked before final thought, including destination 4")
-	check(not scene.get_node("OfficeMission").visible, "office objective absent before thought")
+	check(not p.get_node("QUEST_MISSION").visible, "office objective absent before thought")
 	SaveGame.create_checkpoint(p)
 	await reload_checkpoint()
 	gate_check("gate preserved on early load")
@@ -93,7 +93,7 @@ func run_test():
 		await get_tree().create_timer(0.1).timeout
 	check(q._todos_sairam and b.pensamento_atual_id() == ID, "real NPC exit routes lead to office thought")
 	gate_check("gate remains closed during office thought")
-	check(not scene.get_node("OfficeMission").visible, "objective still absent during office thought")
+	check(not p.get_node("QUEST_MISSION").visible, "objective still absent during office thought")
 	SaveGame.create_checkpoint(p)
 	var midway = SaveGame.state_player.pensamentos.duplicate(true)
 	await reload_checkpoint()
@@ -102,10 +102,10 @@ func run_test():
 	finish_one()
 	await settle()
 	var state = SaveGame.office_mission_state()
-	var row = scene.get_node("OfficeMission/VBoxContainer/HBoxContainer")
+	var row = p.get_node("QUEST_MISSION").rows[3]
 	check(state.elevator_third_floor_unlocked and not state.arrived_third_floor, "thought completion unlocks without arrival")
-	check(scene.get_node("OfficeMission").visible and row.get_node("AnimatedSprite2D").frame == 0, "new objective visible and unchecked")
-	check(row.get_node("Label3").get_theme_font_size("font_size") > 0 and row.get_node("Label3").label_settings.font_size == 9, "same pixel font size as existing tasks")
+	check(p.get_node("QUEST_MISSION").visible and row.get_node("AnimatedSprite2D").frame == 0, "new objective visible and unchecked")
+	check(row.get_node("Label3").label_settings.font_size == 7, "new objective uses the same pixel font size as existing tasks")
 	var second = scene.get_node("Interativos/ElevatorIndicator/Line2D")
 	check(second.visible and second._luzes.size() == 4 and second._luzes.all(func(light): return is_instance_valid(light) and light.visible), "new border with four recreated sibling lights")
 	p.global_position = Vector2(-24, -80)
@@ -133,10 +133,10 @@ func run_test():
 	scene_manager.change_scene(p, "andar_ferramentas")
 	await get_tree().scene_changed
 	await settle()
-	check(scene.get_node("OfficeMission").visible and not SaveGame.office_mission_state().arrived_third_floor, "objective follows player to fourth floor unchecked")
+	check(p.get_node("QUEST_MISSION").visible and not SaveGame.office_mission_state().arrived_third_floor, "objective follows player to fourth floor unchecked")
 	SaveGame.create_checkpoint(p)
 	await reload_checkpoint()
-	check(scene.get_node("OfficeMission").visible and not SaveGame.office_mission_state().arrived_third_floor, "save/load on fourth preserves pending mission")
+	check(p.get_node("QUEST_MISSION").visible and not SaveGame.office_mission_state().arrived_third_floor, "save/load on fourth preserves pending mission")
 	var rollback = SaveGame.checkpoint_world_state.duplicate(true)
 	var trigger
 	for node in scene.get_children():
@@ -149,15 +149,15 @@ func run_test():
 	await settle()
 	check(scene.scene_file_path.ends_with("andar_escritorio.tscn") and SaveGame.office_mission_state().arrived_third_floor, "arrival in office completes mission")
 	check(p.global_position.distance_to(scene.get_node("EntranceMarkers/any").global_position) < 1.0 and SaveGame.checkpoint_pos == p.global_position, "completion checkpoint captures actual entrance position")
-	check(scene.get_node("OfficeMission/VBoxContainer/HBoxContainer/AnimatedSprite2D").is_playing(), "arrival starts existing check animation")
+	check(p.get_node("QUEST_MISSION").markers[3].is_playing(), "arrival starts existing check animation")
 	await get_tree().create_timer(0.5).timeout
 	await capture("office-complete.png")
 	await reload_checkpoint()
-	check(scene.get_node("OfficeMission/VBoxContainer/HBoxContainer/AnimatedSprite2D").frame == 1, "completed check restored from arrival save")
+	check(p.get_node("QUEST_MISSION").markers[3].frame == 1, "completed check restored from arrival save")
 	SaveGame.checkpoint_world_state = rollback
 	SaveGame.checkpoint_scene_path = "res://Scenes/andar_ferramentas.tscn"
 	await reload_checkpoint()
-	check(not SaveGame.office_mission_state().arrived_third_floor and scene.get_node("OfficeMission/VBoxContainer/HBoxContainer/AnimatedSprite2D").frame == 0, "rollback removes later arrival and completed check")
+	check(not SaveGame.office_mission_state().arrived_third_floor and p.get_node("QUEST_MISSION").markers[3].frame == 0, "rollback removes later arrival and completed check")
 	# Legacy save migration from completed thought, without new quest/global fields.
 	SaveGame.save_data.erase("__global")
 	var hall = SaveGame.save_data[HALL]["hall_quest_01"]

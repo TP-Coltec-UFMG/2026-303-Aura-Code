@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://dsw7hwfva88w4" path="res://TelaMorte/morreu.tscn" id="13_l2am8"]
 [ext_resource type="Texture2D" uid="uid://k85qdse5p5ho" path="res://Sprites/Balao_de_pensamento.png" id="16_l2am8"]
 [ext_resource type="Script" uid="uid://dalss1e6fdi2m" path="res://Player/balao_de_pensamento.gd" id="17_0yomn"]
+[ext_resource type="PackedScene" path="res://Player/quest_mission_ui.tscn" id="18_quest_ui"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_i305y"]
 load_path = "res://.godot/imported/Alex_16x16.png-89462274f2a2226fed9efa0756e5c56d.ctex"
@@ -367,6 +368,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 metadata/_edit_use_anchors_ = true
+
+[node name="QUEST_MISSION" parent="." instance=ExtResource("18_quest_ui")]
 
 [connection signal="current_animation_changed" from="AnimationPlayer" to="." method="_on_animation_player_current_animation_changed"]
 [connection signal="value_changed" from="CanvasLayer/Control/estamina" to="CanvasLayer/Control/estamina" method="_on_value_changed"]

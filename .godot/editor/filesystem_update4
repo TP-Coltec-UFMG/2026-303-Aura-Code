@@ -8,3 +8,6 @@ res://Scenes/scripts/quest_mission.gd
 res://Scenes/scripts/base_scene.gd
 res://Scenes/andar_escritorio.tscn
 res://Scenes/quest_mission_andar_escritorio.gd
+res://Objects/scripts/extintor.gd
+res://Scenes/line_2d.gd
+res://Tests/quest_panel_visibility.gd

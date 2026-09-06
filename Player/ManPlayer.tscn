@@ -369,7 +369,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 metadata/_edit_use_anchors_ = true
 
-[node name="QUEST_MISSION" parent="." instance=ExtResource("18_quest_ui")]
+[node name="QUEST_MISSION" parent="." unique_id=1891138085 instance=ExtResource("18_quest_ui")]
 
 [connection signal="current_animation_changed" from="AnimationPlayer" to="." method="_on_animation_player_current_animation_changed"]
 [connection signal="value_changed" from="CanvasLayer/Control/estamina" to="CanvasLayer/Control/estamina" method="_on_value_changed"]

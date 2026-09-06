@@ -19,9 +19,9 @@ func _ready() -> void:
 	hide()
 	var transparent_panel := StyleBoxEmpty.new()
 	$PanelContainer.add_theme_stylebox_override(
-	"panel",
-	transparent_panel
-)
+		"panel",
+		transparent_panel
+	)
 
 
 # ---- A P L I C A  E S C A L A  I N T E R F A C E  ----

@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://di3jn2jnryiad" path="res://Sprites/objects/New Piskel(21).png" id="4_28xab"]
 [ext_resource type="Script" uid="uid://dtfbuvijibmfx" path="res://Objects/scripts/PickupComponent.gd" id="4_o2v6h"]
 [ext_resource type="AudioStream" uid="uid://bs3m1bmybuo3n" path="res://Sounds/fumaca_extintor.MP3" id="7_gjkqf"]
-[ext_resource type="FontFile" uid="uid://b7by8iiefmx8l" path="res://Fonts/PixelifySans-Bold.ttf" id="7_o2v6h"]
 [ext_resource type="AudioStream" uid="uid://c7nxcjmbwjjit" path="res://Sounds/switch3.ogg" id="8_j3h8w"]
 [ext_resource type="Texture2D" uid="uid://dfhkmwfxsu333" path="res://Sprites/ilumination/2d_lights_and_shadows_neutral_point_light.webp" id="9_jc3nj"]
 
@@ -48,9 +47,6 @@ radius = 8.246211
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_d0sfl"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_l2jps"]
-light_mode = 1
-
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_g4v7s"]
 light_mode = 1
 
 [node name="Extintor" type="Node2D" unique_id=1140399274]
@@ -104,26 +100,11 @@ stream = ExtResource("7_gjkqf")
 bus = &"sfx"
 
 [node name="Combustive" type="ProgressBar" parent="." unique_id=638612308]
-visible = false
 material = SubResource("CanvasItemMaterial_l2jps")
-offset_left = -144.0
-offset_top = -309.0
-offset_right = 32.0
-offset_bottom = -300.0
-show_percentage = false
-
-[node name="Label" type="Label" parent="Combustive" unique_id=715963063]
-material = SubResource("CanvasItemMaterial_g4v7s")
-layout_mode = 0
-offset_left = -77.0
-offset_top = -7.0
-offset_right = -4.0
+offset_left = 21.0
+offset_top = -14.0
+offset_right = 58.0
 offset_bottom = 13.0
-theme_override_colors/font_shadow_color = Color(1, 1, 1, 0)
-theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("7_o2v6h")
-text = "Extintor"
-horizontal_alignment = 1
 
 [node name="Line2D" type="Line2D" parent="." unique_id=1481861323]
 visible = false

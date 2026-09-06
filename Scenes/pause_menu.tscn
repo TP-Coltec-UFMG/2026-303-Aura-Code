@@ -58,6 +58,32 @@
 shader = ExtResource("1_nwcfo")
 shader_parameter/lod = 0.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f1qxr"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_greiu"]
+bg_color = Color(0.0696115, 0.06961152, 0.06961146, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2goek"]
+bg_color = Color(0.16206557, 0.1620656, 0.16206548, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_72uyr"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 1)
+
 [sub_resource type="Animation" id="Animation_p81d2"]
 length = 0.001
 tracks/0/type = "value"
@@ -75,18 +101,18 @@ tracks/0/keys = {
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("PanelContainer:modulate:r")
+tracks/1/path = NodePath("PanelContainer:modulate:a")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "handle_modes": PackedInt32Array(0),
-"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0),
+"points": PackedFloat32Array(0, -0.15, 0, 0.15, 0),
 "times": PackedFloat32Array(0)
 }
 tracks/2/type = "bezier"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("PanelContainer:modulate:g")
+tracks/2/path = NodePath("PanelContainer:modulate:b")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -97,7 +123,7 @@ tracks/2/keys = {
 tracks/3/type = "bezier"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("PanelContainer:modulate:b")
+tracks/3/path = NodePath("PanelContainer:modulate:g")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -108,12 +134,12 @@ tracks/3/keys = {
 tracks/4/type = "bezier"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("PanelContainer:modulate:a")
+tracks/4/path = NodePath("PanelContainer:modulate:r")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "handle_modes": PackedInt32Array(0),
-"points": PackedFloat32Array(0, -0.15, 0, 0.15, 0),
+"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0),
 "times": PackedFloat32Array(0)
 }
 
@@ -130,50 +156,50 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0.0009999999, 0.3),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 0.93200004427]
+"values": [0.0, 5.0]
 }
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("PanelContainer:modulate:r")
+tracks/1/path = NodePath("PanelContainer:modulate:a")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"handle_modes": PackedInt32Array(0, 2),
-"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0, 1, -0.04983334, 0, 0, 0),
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, -0.15, 0, 0.15, 0, 1, -0.04983334, -0.16666667, 0, 0),
 "times": PackedFloat32Array(0.001, 0.3)
 }
 tracks/2/type = "bezier"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("PanelContainer:modulate:g")
+tracks/2/path = NodePath("PanelContainer:modulate:b")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"handle_modes": PackedInt32Array(0, 2),
+"handle_modes": PackedInt32Array(0, 0),
 "points": PackedFloat32Array(1, -0.15, 0, 0.15, 0, 1, -0.04983334, 0, 0, 0),
 "times": PackedFloat32Array(0.001, 0.3)
 }
 tracks/3/type = "bezier"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("PanelContainer:modulate:b")
+tracks/3/path = NodePath("PanelContainer:modulate:g")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"handle_modes": PackedInt32Array(0, 2),
+"handle_modes": PackedInt32Array(0, 0),
 "points": PackedFloat32Array(1, -0.15, 0, 0.15, 0, 1, -0.04983334, 0, 0, 0),
 "times": PackedFloat32Array(0.001, 0.3)
 }
 tracks/4/type = "bezier"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("PanelContainer:modulate:a")
+tracks/4/path = NodePath("PanelContainer:modulate:r")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"handle_modes": PackedInt32Array(0, 2),
-"points": PackedFloat32Array(0, -0.15, 0, 0.15, 0, 1, -0.04983334, -0.16666667, 0, 0),
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0, 1, -0.04983334, 0, 0, 0),
 "times": PackedFloat32Array(0.001, 0.3)
 }
 
@@ -280,6 +306,12 @@ func _on_back_to_menu_button_mouse_entered() -> void:
 	if Configs.configs.leitor_de_tela:
 		LeitorDeTela._ler_texto(atr(\"VOLTAR\"))
 "
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tbjth"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4bo1l"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m7e8o"]
 
 [sub_resource type="GDScript" id="GDScript_gj1q6"]
 script/source = "extends Node2D
@@ -435,33 +467,47 @@ offset_right = 68.75
 offset_bottom = 68.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_f1qxr")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=166143369]
 layout_mode = 2
+theme_override_constants/separation = 4
 alignment = 1
 
 [node name="Resume" type="Button" parent="PanelContainer/VBoxContainer" unique_id=1335414133]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_05uyy")
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_greiu")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_2goek")
+theme_override_styles/hover = SubResource("StyleBoxFlat_72uyr")
 text = "Voltar"
 
 [node name="Restart" type="Button" parent="PanelContainer/VBoxContainer" unique_id=2013142122]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_05uyy")
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_greiu")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_2goek")
+theme_override_styles/hover = SubResource("StyleBoxFlat_72uyr")
 text = "Resetar"
 
 [node name="Options" type="Button" parent="PanelContainer/VBoxContainer" unique_id=1159673506]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_05uyy")
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_greiu")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_2goek")
+theme_override_styles/hover = SubResource("StyleBoxFlat_72uyr")
 text = "Opções"
 
 [node name="Quit" type="Button" parent="PanelContainer/VBoxContainer" unique_id=408162180]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_05uyy")
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_greiu")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_2goek")
+theme_override_styles/hover = SubResource("StyleBoxFlat_72uyr")
 text = "Sair
 "
 
@@ -546,6 +592,9 @@ theme_override_constants/separation = 4
 [node name="MenuSoundsSettings" parent="Opcoes/VContainer/VContainer" unique_id=464511439 groups=["alto_contraste"] instance=ExtResource("9_2s720")]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_tbjth")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_4bo1l")
+theme_override_styles/hover = SubResource("StyleBoxFlat_m7e8o")
 text = "Volume"
 icon = ExtResource("11_aobs3")
 flat = false
@@ -1451,8 +1500,8 @@ script = ExtResource("51_h3d7w")
 [connection signal="value_changed" from="Accessibility/VContainer/LeitorDeTela/Velocidade" to="Accessibility/VContainer/LeitorDeTela" method="_on_velocidade_value_changed"]
 [connection signal="mouse_entered" from="Accessibility/VContainer/AltoContraste" to="Accessibility/VContainer/AltoContraste" method="_on_mouse_entered"]
 [connection signal="toggled" from="Accessibility/VContainer/AltoContraste" to="Accessibility/VContainer/AltoContraste" method="_on_toggled"]
-[connection signal="pressed" from="Accessibility/BackToMenuButton" to="." method="_on_back_to_menu_button_pressed_controles"]
 [connection signal="pressed" from="Accessibility/BackToMenuButton" to="." method="_on_back_to_menu_button_pressed_on_acessibility"]
+[connection signal="pressed" from="Accessibility/BackToMenuButton" to="." method="_on_back_to_menu_button_pressed_controles"]
 [connection signal="pressed" from="Controles/BackToMenuButton" to="." method="_on_back_to_menu_button_pressed_controles"]
 [connection signal="pressed" from="Controles/VBoxContainer/InputRemapButton" to="Controles/VBoxContainer/InputRemapButton" method="_on_pressed"]
 [connection signal="toggled" from="Controles/VBoxContainer/InputRemapButton" to="Controles/VBoxContainer/InputRemapButton" method="_on_toggled"]

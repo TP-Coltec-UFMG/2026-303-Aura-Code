@@ -60,6 +60,7 @@ func _ready() -> void:
 			SaveGame.create_checkpoint(player)
 
 	call_deferred("atualizar_camera")
+	call_deferred("atualizar_missao_escritorio")
 
 
 func get_scene_player() -> Player:
@@ -109,3 +110,12 @@ func atualizar_camera() -> void:
 	camera.make_current()
 	camera.reset_smoothing()
 	camera.force_update_scroll()
+
+
+# Executado depois de position_player/apply_pending_checkpoint, em todos os andares.
+func atualizar_missao_escritorio() -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or not is_instance_valid(player):
+		return
+	if not has_node("OfficeMission"):
+		add_child(preload("res://Scenes/office_mission.tscn").instantiate())
+	$OfficeMission.atualizar(player)

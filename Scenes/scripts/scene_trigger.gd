@@ -43,6 +43,8 @@ func _get_connect_scene_andar_novo(andar : int) -> String:
 	return "andar_invalido"
 	
 func usar_elevador(andar: int) -> void:
+	if eh_elevador and not elevador_liberado():
+		return
 	if andar == -2:
 		if dentro_da_area:
 			body_p.set_physics_process(true)
@@ -53,7 +55,7 @@ func usar_elevador(andar: int) -> void:
 			body_p.inventory.show()
 			controle_de_tempo.show()
 			$"../UI/PauseMenu".process_mode = Node.PROCESS_MODE_ALWAYS
-		
+		return
 	if andar != andar_atual and eh_elevador:
 		if dentro_da_area:
 			body_p.inventory.hide()
@@ -83,7 +85,9 @@ func get_ultima_posicao() -> Vector2:
 func _input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("interact") and eh_elevador and dentro_da_area:
-		
+		if not elevador_liberado():
+			return
+
 		ultima_posicao = body_p.global_position
 		body_p.set_physics_process(false)
 		body_p.global_position += Vector2(-20, -200)
@@ -113,3 +117,11 @@ func _input(event: InputEvent) -> void:
 			aceso_negado.play()
 			print("Acesso Negado")
 			
+
+
+func elevador_liberado() -> bool:
+	if not is_inside_tree():
+		return false
+	if not get_tree().current_scene.scene_file_path.ends_with("andar_hall.tscn"):
+		return true
+	return bool(SaveGame.office_mission_state().get("elevator_third_floor_unlocked", false))

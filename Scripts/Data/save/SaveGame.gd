@@ -480,6 +480,17 @@ func load_object_state(object_id: String) -> Variant:
 
 	return save_data[scene_path].get(object_id, null)
 
+func save_global_state(object_id: String, state: Variant) -> void:
+	if not save_data.has("__global"):
+		save_data["__global"] = {}
+	save_data["__global"][object_id] = state
+
+func load_global_state(object_id: String) -> Variant:
+	var global_state: Variant = save_data.get("__global", {})
+	if global_state is Dictionary:
+		return global_state.get(object_id, null)
+	return null
+
 
 func set_object_collected(object_id: String) -> void:
 	save_object_state(object_id, true)
@@ -574,3 +585,22 @@ func _notification(what: int) -> void:
 		or what == NOTIFICATION_APPLICATION_PAUSED
 	):
 		save_current_session()
+
+
+# O estado global participa do mesmo snapshot/rollback do restante do mundo.
+# Migração usa a fala concluída, nunca apenas o início da evacuação.
+func office_mission_state(current_player: Player = null) -> Dictionary:
+	var estado: Variant = load_global_state("hall_quest_01")
+	if estado is Dictionary:
+		return estado
+	var hall: Dictionary = save_data.get("res://Scenes/andar_hall.tscn", {}).get("hall_quest_01", {})
+	var liberado := bool(hall.get("elevator_third_floor_unlocked", false))
+	if current_player != null:
+		liberado = liberado or current_player.balao_de_pensamento.foi_concluido("hall:hall_quest_01:pos_saida_2")
+	estado = {
+		"elevator_third_floor_unlocked": liberado,
+		"arrived_third_floor": bool(hall.get("arrived_third_floor", false)),
+		"indicator_remaining": 0.0
+	}
+	save_global_state("hall_quest_01", estado)
+	return estado

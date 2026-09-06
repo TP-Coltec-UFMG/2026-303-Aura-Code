@@ -4,6 +4,8 @@ extends Line2D
 
 const DURACAO_INDICADOR: float = 10.0
 
+@export var ciclo_final: bool = false
+
 var _quest: CanvasLayer
 var _temporizador: Timer
 var _tempo_restante: float = DURACAO_INDICADOR
@@ -26,6 +28,8 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
+	if ciclo_final:
+		_tempo_restante = float(SaveGame.office_mission_state().get("indicator_remaining", 10.0))
 	_temporizador = Timer.new()
 	_temporizador.one_shot = true
 	_temporizador.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -42,7 +46,7 @@ func _ready() -> void:
 func _conectar_quest() -> void:
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
-	_quest = get_node_or_null("../../QUEST_MISSION") as CanvasLayer
+	_quest = get_tree().current_scene.get_node_or_null("QUEST_MISSION") as CanvasLayer
 	if _quest == null:
 		push_warning("Borda do elevador sem QUEST_MISSION na cena.")
 		return
@@ -109,16 +113,20 @@ func _suspender_contagem() -> void:
 func _liberar_indicador() -> void:
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
+	if ciclo_final:
+		SaveGame.office_mission_state()["indicator_remaining"] = 0.0
 	_temporizador.stop()
 	_definir_visibilidade(false)
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
 	_tween = null
-	# As luzes são irmãs: liberar só a borda não as removeria da memória.
 	for luz in _luzes:
 		if is_instance_valid(luz):
 			luz.queue_free()
-	queue_free()
+	if ciclo_final:
+		get_parent().queue_free()
+	else:
+		queue_free()
 
 
 func _animar_fase(fator: float) -> void:
@@ -141,3 +149,8 @@ func _restaurar_intensidades() -> void:
 	for i in range(_luzes.size()):
 		if is_instance_valid(_luzes[i]):
 			_luzes[i].energy = _energias_originais[i]
+
+
+func _process(_delta: float) -> void:
+	if ciclo_final and is_instance_valid(_temporizador) and not _temporizador.is_stopped():
+		SaveGame.office_mission_state()["indicator_remaining"] = _temporizador.time_left

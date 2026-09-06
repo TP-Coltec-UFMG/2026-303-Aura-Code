@@ -1,0 +1,70 @@
+[gd_scene format=3]
+
+[ext_resource type="FontFile" uid="uid://4u0s2rx02af5" path="res://Fonts/PixelifySans-Medium.ttf" id="18_pfqqk"]
+[ext_resource type="Texture2D" uid="uid://bnat7qx6txmu4" path="res://Sprites/ui/New_Piskel.png" id="19_xl0vw"]
+[ext_resource type="Texture2D" uid="uid://ilqnqop4tga7" path="res://Sprites/ui/New_Piskel1.png" id="20_xodlo"]
+
+[ext_resource type="Script" path="res://Scenes/scripts/office_mission.gd" id="script"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_g4v7s"]
+font = ExtResource("18_pfqqk")
+font_size = 10
+outline_size = 1
+
+[sub_resource type="LabelSettings" id="LabelSettings_xl0vw"]
+font = ExtResource("18_pfqqk")
+font_size = 9
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_g4v7s"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("19_xl0vw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_xodlo")
+}],
+"loop": 0,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="OfficeMission" type="CanvasLayer"]
+script = ExtResource("script")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = 344.0
+offset_top = 35.0
+offset_right = 480.0
+offset_bottom = 84.0
+color = Color(0.094684996, 0.09468501, 0.09468501, 1)
+
+[node name="Label2" type="Label" parent="." groups=["alto_contraste"]]
+offset_left = 390.0
+offset_top = 37.0
+offset_right = 451.0
+offset_bottom = 50.0
+text = "TAREFAS"
+label_settings = SubResource("LabelSettings_g4v7s")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 359.0
+offset_top = 55.0
+offset_right = 475.0
+offset_bottom = 80.0
+theme_override_constants/separation = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer" groups=["alto_contraste"]]
+layout_mode = 2
+text = "Ir para o terceiro andar"
+label_settings = SubResource("LabelSettings_xl0vw")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer"]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_g4v7s")
+frame = 0
+

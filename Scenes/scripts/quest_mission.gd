@@ -30,6 +30,9 @@ var _dica_mostrada: bool = false
 var _saida_pendente: int = 0
 var _task_saida: HBoxContainer
 var _evacuacao_ativa: bool = false
+var _elevador_terceiro_liberado: bool = false
+var _chegou_terceiro_andar: bool = false
+
 
 
 func _notification(what: int) -> void:
@@ -71,6 +74,8 @@ func _inicializar() -> void:
 		_pensamento_id("pos_saida_2"),
 		"Talvez eu deveria ir na sala do escritório (3º andar)"
 	)
+	if _elevador_terceiro_liberado:
+		_instanciar_indicador_final()
 
 	if _hide_scheduled:
 		_iniciar_espera_npcs()
@@ -113,7 +118,7 @@ func _descartar_instrucoes_obsoletas() -> void:
 
 
 func _atualizar_visibilidade() -> void:
-	if not _inicializado or get_tree().paused:
+	if not is_inside_tree() or is_queued_for_deletion() or not _inicializado or get_tree().paused:
 		return
 	var balao = man_player.balao_de_pensamento
 	visible = balao.foi_concluido(_pensamento_id("intro_2")) and not (_hide_scheduled and not _pensamento_pendente("saida"))
@@ -133,6 +138,35 @@ func _on_pensamento_finalizado(id: String) -> void:
 		_atualizar_visibilidade()
 	elif id == _pensamento_id("saida"):
 		_hide_after_completion()
+	elif id == _pensamento_id("pos_saida_2"):
+		_liberar_elevador_terceiro()
+
+func _liberar_elevador_terceiro() -> void:
+	if _elevador_terceiro_liberado:
+		return
+	_elevador_terceiro_liberado = true
+	var estado := SaveGame.office_mission_state()
+	estado["elevator_third_floor_unlocked"] = true
+	estado["indicator_remaining"] = 10.0
+	SaveGame.save_global_state(save_id, estado)
+	_save_progress_and_checkpoint()
+	get_parent().atualizar_missao_escritorio()
+	_instanciar_indicador_final()
+
+
+func _instanciar_indicador_final() -> void:
+	if float(SaveGame.office_mission_state().get("indicator_remaining", 0.0)) <= 0.0:
+		return
+	var pai := get_parent().get_node_or_null("Interativos")
+	if pai == null or pai.has_node("ElevatorIndicator"):
+		return
+	var antigo := pai.get_node_or_null("Line2D")
+	if antigo != null:
+		antigo._liberar_indicador()
+	orientar_elevador = true
+	var novo := preload("res://Scenes/elevator_indicator.tscn").instantiate()
+	novo.get_node("Line2D").ciclo_final = true
+	pai.add_child(novo)
 
 
 func _on_fogo_3_fogo_apagou() -> void:
@@ -264,7 +298,7 @@ func _start_npc_exit_paths(legacy_restore: bool = false) -> void:
 
 func _iniciar_espera_npcs() -> void:
 	if _todos_sairam:
-		_concluir_saida_npcs()
+		_concluir_saida_depois_da_animacao(null)
 		return
 	if _task_saida == null:
 		_task_saida = $VBoxContainer/HBoxContainer.duplicate()
@@ -319,7 +353,7 @@ func _concluir_saida_npcs() -> void:
 func _concluir_saida_depois_da_animacao(marcador: AnimatedSprite2D) -> void:
 	if marcador != null:
 		await marcador.animation_finished
-	if not _pos_saida_iniciada:
+	if not is_inside_tree() or is_queued_for_deletion() or not _pos_saida_iniciada:
 		return
 	_pensar("pos_saida_1", "Eu tenho que investigar isso.")
 	_pensar("pos_saida_2", "Talvez eu deveria ir na sala do escritório (3º andar)")
@@ -327,7 +361,7 @@ func _concluir_saida_depois_da_animacao(marcador: AnimatedSprite2D) -> void:
 
 
 func _hide_after_completion() -> void:
-	await get_tree().create_timer(5.0).timeout
+	await get_tree().create_timer(5.0, false).timeout
 
 	if is_inside_tree():
 		hide()
@@ -346,6 +380,8 @@ func _save_progress_and_checkpoint() -> void:
 			"everyone_out": _todos_sairam,
 			"post_exit_started": _pos_saida_iniciada,
 			"office_hint_shown": _dica_mostrada
+			,"elevator_third_floor_unlocked": _elevador_terceiro_liberado
+			,"arrived_third_floor": _chegou_terceiro_andar
 		}
 	)
 
@@ -388,6 +424,8 @@ func _restore_progress() -> void:
 		_todos_sairam = bool(saved_state.get("everyone_out", false))
 		_pos_saida_iniciada = bool(saved_state.get("post_exit_started", false))
 		_dica_mostrada = bool(saved_state.get("office_hint_shown", false))
+		_elevador_terceiro_liberado = bool(saved_state.get("elevator_third_floor_unlocked", false))
+		_chegou_terceiro_andar = bool(saved_state.get("arrived_third_floor", false))
 
 	else:
 		f1_acesso = not _is_saved_fire_extinguished("fogo04")
@@ -399,6 +437,10 @@ func _restore_progress() -> void:
 			and not f2_acesso
 			and not f3_acesso
 		)
+	var global_state: Variant = SaveGame.office_mission_state(man_player)
+	if global_state is Dictionary:
+		_elevador_terceiro_liberado = bool(global_state.get("elevator_third_floor_unlocked", _elevador_terceiro_liberado))
+		_chegou_terceiro_andar = bool(global_state.get("arrived_third_floor", _chegou_terceiro_andar))
 
 	if not f1_acesso and not f2_acesso and not f3_acesso:
 		M1_feito = true

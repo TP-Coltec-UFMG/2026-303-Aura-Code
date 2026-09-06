@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://h1wwb1u6gk0m" path="res://Scenes/line_2d.gd" id="13_m7e8o"]
+[ext_resource type="Texture2D" uid="uid://dwcv8necjuiw1" path="res://Sprites/ilumination/gradient-horizontal-mirror.png" id="14_pjvw7"]
+
+[node name="ElevatorIndicator" type="Node2D"]
+
+[node name="Line2D" type="Line2D" parent="."]
+z_index = 99
+points = PackedVector2Array(-41, -127, -10, -127, -10, -95, -41, -95)
+closed = true
+width = 0.91
+script = ExtResource("13_m7e8o")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+position = Vector2(-10, -111)
+scale = Vector2(0.035156276, 0.16406249)
+texture = ExtResource("14_pjvw7")
+
+[node name="PointLight2D2" type="PointLight2D" parent="."]
+position = Vector2(-41, -111)
+scale = Vector2(0.035156276, 0.16406249)
+texture = ExtResource("14_pjvw7")
+
+[node name="PointLight2D3" type="PointLight2D" parent="."]
+position = Vector2(-25.420288, -127)
+rotation = 1.5707964
+scale = Vector2(0.035156276, 0.15584177)
+texture = ExtResource("14_pjvw7")
+
+[node name="PointLight2D4" type="PointLight2D" parent="."]
+position = Vector2(-25.42029, -95.00001)
+rotation = 1.5707964
+scale = Vector2(0.035156276, 0.15584177)
+texture = ExtResource("14_pjvw7")
+

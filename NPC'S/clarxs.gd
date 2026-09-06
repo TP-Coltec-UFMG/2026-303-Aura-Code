@@ -1,5 +1,7 @@
 extends Node2D
 
+signal npc_saiu
+
 
 @export_category("NPC")
 
@@ -446,6 +448,7 @@ func go_to_next_path_point() -> void:
 	if finished_path.delete_npc_at_end:
 		if save_enabled:
 			SaveGame.mark_checkpoint_actor_removed(self)
+		npc_saiu.emit()
 		queue_free()
 		return
 

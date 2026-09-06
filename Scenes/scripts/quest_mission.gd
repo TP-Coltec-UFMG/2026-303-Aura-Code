@@ -24,6 +24,12 @@ var M1_feito: bool = false
 var M2_feito: bool = false
 
 var _hide_scheduled: bool = false
+var _todos_sairam: bool = false
+var _pos_saida_iniciada: bool = false
+var _dica_mostrada: bool = false
+var _saida_pendente: int = 0
+var _task_saida: HBoxContainer
+var _evacuacao_ativa: bool = false
 
 
 func _notification(what: int) -> void:
@@ -61,8 +67,13 @@ func _inicializar() -> void:
 	_descartar_instrucoes_obsoletas()
 	# O Player pode ter restaurado a fala antes da conexão dos sinais da missão.
 	_on_pensamento_iniciado(man_player.balao_de_pensamento.pensamento_atual_id())
+	man_player.balao_de_pensamento.atualizar_texto(
+		_pensamento_id("pos_saida_2"),
+		"Talvez eu deveria ir na sala do escritório (3º andar)"
+	)
 
 	if _hide_scheduled:
+		_iniciar_espera_npcs()
 		_start_npc_exit_paths(true)
 		_atualizar_visibilidade()
 		return
@@ -211,7 +222,9 @@ func _tentar_finalizar_missao() -> bool:
 	_hide_scheduled = true
 
 	_start_npc_exit_paths()
-	_pensar("saida", "Saiam todos! SAIAM, SAIAM, SAIAM!!")
+	_pensar("saida", "Vai, vai, vai, vai! Corram! Corram todos! Saiam!")
+	_pos_saida_iniciada = true
+	_iniciar_espera_npcs()
 	_save_progress_and_checkpoint()
 	return true
 
@@ -249,6 +262,70 @@ func _start_npc_exit_paths(legacy_restore: bool = false) -> void:
 			path.start_path()
 
 
+func _iniciar_espera_npcs() -> void:
+	if _todos_sairam:
+		_concluir_saida_npcs()
+		return
+	if _task_saida == null:
+		_task_saida = $VBoxContainer/HBoxContainer.duplicate()
+		_task_saida.name = "TarefaSaida"
+		var texto := _task_saida.get_node("Label3") as Label
+		texto.text = "Espere todo mundo sair."
+		var marcador := _task_saida.get_node("AnimatedSprite2D") as AnimatedSprite2D
+		marcador.stop()
+		marcador.animation = &"default"
+		marcador.frame = 0
+		marcador.frame_progress = 0.0
+		$VBoxContainer.add_child(_task_saida)
+		_task_saida.show()
+	var npcs := get_node_or_null("../NPCs")
+	_saida_pendente = 0
+	_evacuacao_ativa = true
+	if npcs != null:
+		for npc in npcs.get_children():
+			if npc.is_queued_for_deletion():
+				continue
+			_saida_pendente += 1
+			if npc.has_signal("npc_saiu"):
+				if not npc.npc_saiu.is_connected(_on_npc_saiu):
+					npc.npc_saiu.connect(_on_npc_saiu, CONNECT_ONE_SHOT)
+			elif not npc.tree_exiting.is_connected(_on_npc_saiu):
+				npc.tree_exiting.connect(_on_npc_saiu, CONNECT_ONE_SHOT)
+	if _saida_pendente == 0:
+		_concluir_saida_npcs()
+
+
+func _on_npc_saiu() -> void:
+	if not _evacuacao_ativa or not is_inside_tree():
+		return
+	_saida_pendente = maxi(_saida_pendente - 1, 0)
+	if _saida_pendente == 0:
+		_concluir_saida_npcs()
+
+
+func _concluir_saida_npcs() -> void:
+	if _todos_sairam:
+		return
+	_todos_sairam = true
+	_evacuacao_ativa = false
+	if is_instance_valid(_task_saida):
+		var marcador := _task_saida.get_node("AnimatedSprite2D") as AnimatedSprite2D
+		marcador.play("default")
+		_concluir_saida_depois_da_animacao(marcador)
+		return
+	_concluir_saida_depois_da_animacao(null)
+
+
+func _concluir_saida_depois_da_animacao(marcador: AnimatedSprite2D) -> void:
+	if marcador != null:
+		await marcador.animation_finished
+	if not _pos_saida_iniciada:
+		return
+	_pensar("pos_saida_1", "Eu tenho que investigar isso.")
+	_pensar("pos_saida_2", "Talvez eu deveria ir na sala do escritório (3º andar)")
+	_save_progress_and_checkpoint()
+
+
 func _hide_after_completion() -> void:
 	await get_tree().create_timer(5.0).timeout
 
@@ -265,7 +342,10 @@ func _save_progress_and_checkpoint() -> void:
 			"fire_3_done": not f3_acesso,
 			"task_fire_done": M1_feito,
 			"task_elevator_done": M2_feito,
-			"exit_started": _hide_scheduled
+			"exit_started": _hide_scheduled,
+			"everyone_out": _todos_sairam,
+			"post_exit_started": _pos_saida_iniciada,
+			"office_hint_shown": _dica_mostrada
 		}
 	)
 
@@ -305,6 +385,9 @@ func _restore_progress() -> void:
 		)
 		# Saves antigos só registravam as tarefas, sem a etapa de saída.
 		_hide_scheduled = bool(saved_state.get("exit_started", M1_feito and M2_feito))
+		_todos_sairam = bool(saved_state.get("everyone_out", false))
+		_pos_saida_iniciada = bool(saved_state.get("post_exit_started", false))
+		_dica_mostrada = bool(saved_state.get("office_hint_shown", false))
 
 	else:
 		f1_acesso = not _is_saved_fire_extinguished("fogo04")

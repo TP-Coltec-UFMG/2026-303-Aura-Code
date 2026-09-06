@@ -33,6 +33,15 @@ func enfileirar(id: String, texto: String) -> void:
 	_iniciar_proximo()
 
 
+func atualizar_texto(id: String, texto: String) -> void:
+	if str(_ativo.get("id", "")) == id:
+		_ativo["texto"] = texto
+		label.text = texto
+	for item in _fila:
+		if item["id"] == id:
+			item["texto"] = texto
+
+
 func tem_pensamento(id: String) -> bool:
 	if foi_concluido(id) or _descartados.has(id) or str(_ativo.get("id", "")) == id:
 		return true

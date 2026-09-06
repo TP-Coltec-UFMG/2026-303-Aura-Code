@@ -100,6 +100,7 @@ stream = ExtResource("7_gjkqf")
 bus = &"sfx"
 
 [node name="Combustive" type="ProgressBar" parent="." unique_id=638612308]
+visible = false
 material = SubResource("CanvasItemMaterial_l2jps")
 offset_left = 21.0
 offset_top = -14.0

@@ -60,7 +60,7 @@ func _ready() -> void:
 			SaveGame.create_checkpoint(player)
 
 	call_deferred("atualizar_camera")
-	call_deferred("atualizar_missao_escritorio")
+	call_deferred("_registrar_chegada_escritorio")
 
 
 func get_scene_player() -> Player:
@@ -113,9 +113,15 @@ func atualizar_camera() -> void:
 
 
 # Executado depois de position_player/apply_pending_checkpoint, em todos os andares.
-func atualizar_missao_escritorio() -> void:
-	if not is_inside_tree() or is_queued_for_deletion() or not is_instance_valid(player):
+func _registrar_chegada_escritorio() -> void:
+	if not is_inside_tree() or not is_instance_valid(player):
 		return
-	if not has_node("OfficeMission"):
-		add_child(preload("res://Scenes/office_mission.tscn").instantiate())
-	$OfficeMission.atualizar(player)
+	if not get_tree().current_scene.scene_file_path.ends_with("andar_escritorio.tscn"):
+		return
+	var estado := SaveGame.office_mission_state(player)
+	if not bool(estado.get("elevator_third_floor_unlocked", false)) or bool(estado.get("arrived_third_floor", false)):
+		return
+	estado["arrived_third_floor"] = true
+	SaveGame.save_global_state("hall_quest_01", estado)
+	if player.checkpoint_enabled:
+		SaveGame.create_checkpoint(player)

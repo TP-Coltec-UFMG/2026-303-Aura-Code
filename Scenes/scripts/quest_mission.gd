@@ -9,6 +9,7 @@ extends CanvasLayer
 	$VBoxContainer/HBoxContainer2/AnimatedSprite2D
 )
 @onready var M3: AnimatedSprite2D = $VBoxContainer/HBoxContainer3/AnimatedSprite2D
+@onready var M4: AnimatedSprite2D = $VBoxContainer/HBoxContainer4/AnimatedSprite2D
 
 
 var man_player: Player
@@ -30,7 +31,6 @@ var _todos_sairam: bool = false
 var _pos_saida_iniciada: bool = false
 var _dica_mostrada: bool = false
 var _saida_pendente: int = 0
-var _task_saida: HBoxContainer
 var _evacuacao_ativa: bool = false
 var _elevador_terceiro_liberado: bool = false
 var _chegou_terceiro_andar: bool = false
@@ -62,6 +62,7 @@ func _inicializar() -> void:
 
 	_restore_progress()
 	_apply_saved_visuals()
+	_atualizar_linhas_tarefas()
 	_inicializado = true
 	man_player.balao_de_pensamento.pensamento_finalizado.connect(_on_pensamento_finalizado)
 	man_player.balao_de_pensamento.pensamento_iniciado.connect(_on_pensamento_iniciado)
@@ -77,7 +78,7 @@ func _inicializar() -> void:
 		"Talvez eu deveria ir na sala do escritório (3º andar)"
 	)
 	if _elevador_terceiro_liberado:
-		_instanciar_indicador_final()
+		_atualizar_tarefa_terceiro()
 
 	if _hide_scheduled:
 		_iniciar_espera_npcs()
@@ -101,11 +102,6 @@ func _pensar(id: String, texto: String) -> void:
 	man_player.balao_de_pensamento.enfileirar(_pensamento_id(id), texto)
 
 
-func _pensamento_pendente(id: String) -> bool:
-	var balao = man_player.balao_de_pensamento
-	return balao.esta_pendente(_pensamento_id(id))
-
-
 func _descartar_instrucoes_obsoletas() -> void:
 	# Remove também a fala antiga quando ela vier ativa ou enfileirada no save.
 	var ids: Array[String] = [_pensamento_id("intro_3")]
@@ -123,7 +119,11 @@ func _atualizar_visibilidade() -> void:
 	if not is_inside_tree() or is_queued_for_deletion() or not _inicializado or get_tree().paused:
 		return
 	var balao = man_player.balao_de_pensamento
-	visible = balao.foi_concluido(_pensamento_id("intro_2")) and not (_hide_scheduled and not _pensamento_pendente("saida"))
+	visible = (
+		balao.foi_concluido(_pensamento_id("intro_2"))
+		or _hide_scheduled
+		or _elevador_terceiro_liberado
+	)
 
 
 func _on_pensamento_iniciado(id: String) -> void:
@@ -139,7 +139,7 @@ func _on_pensamento_finalizado(id: String) -> void:
 	if id == _pensamento_id("intro_2"):
 		_atualizar_visibilidade()
 	elif id == _pensamento_id("saida"):
-		_hide_after_completion()
+		_atualizar_visibilidade()
 	elif id == _pensamento_id("pos_saida_2"):
 		_liberar_elevador_terceiro()
 
@@ -152,8 +152,38 @@ func _liberar_elevador_terceiro() -> void:
 	estado["indicator_remaining"] = 10.0
 	SaveGame.save_global_state(save_id, estado)
 	_save_progress_and_checkpoint()
-	get_parent().atualizar_missao_escritorio()
 	_instanciar_indicador_final()
+	_atualizar_tarefa_terceiro()
+	_atualizar_visibilidade()
+
+
+func _atualizar_tarefa_terceiro() -> void:
+	var linha := $VBoxContainer/HBoxContainer4
+	var texto := linha.get_node("Label3") as Label
+	texto.text = "IR PARA O TERCEIRO ANDAR"
+	linha.show()
+	if _chegou_terceiro_andar:
+		_set_completed_frame(M4)
+	else:
+		M4.stop()
+		M4.animation = &"default"
+		M4.frame = 0
+
+
+func _atualizar_linhas_tarefas() -> void:
+	var linha_saida := $VBoxContainer/HBoxContainer3
+	linha_saida.visible = _hide_scheduled
+	if _hide_scheduled:
+		linha_saida.get_node("Label3").text = "ESPERE TODO MUNDO SAIR"
+		if _todos_sairam:
+			_set_completed_frame(M3)
+		else:
+			M3.stop()
+			M3.animation = &"default"
+			M3.frame = 0
+	$VBoxContainer/HBoxContainer4.visible = _elevador_terceiro_liberado
+	if _elevador_terceiro_liberado:
+		_atualizar_tarefa_terceiro()
 
 
 func _instanciar_indicador_final() -> void:
@@ -299,21 +329,16 @@ func _start_npc_exit_paths(legacy_restore: bool = false) -> void:
 
 
 func _iniciar_espera_npcs() -> void:
+	$VBoxContainer/HBoxContainer3.show()
 	if _todos_sairam:
 		_concluir_saida_depois_da_animacao(null)
 		return
-	if _task_saida == null:
-		_task_saida = $VBoxContainer/HBoxContainer.duplicate()
-		_task_saida.name = "TarefaSaida"
-		var texto := _task_saida.get_node("Label3") as Label
-		texto.text = "Espere todo mundo sair."
-		var marcador := _task_saida.get_node("AnimatedSprite2D") as AnimatedSprite2D
-		marcador.stop()
-		marcador.animation = &"default"
-		marcador.frame = 0
-		marcador.frame_progress = 0.0
-		$VBoxContainer.add_child(_task_saida)
-		_task_saida.show()
+	$VBoxContainer/HBoxContainer3/Label3.text = "ESPERE TODO MUNDO SAIR"
+	M3.stop()
+	M3.animation = &"default"
+	M3.frame = 0
+	M3.frame_progress = 0.0
+	$VBoxContainer/HBoxContainer3.show()
 	var npcs := get_node_or_null("../NPCs")
 	_saida_pendente = 0
 	_evacuacao_ativa = true
@@ -344,12 +369,8 @@ func _concluir_saida_npcs() -> void:
 		return
 	_todos_sairam = true
 	_evacuacao_ativa = false
-	if is_instance_valid(_task_saida):
-		var marcador := _task_saida.get_node("AnimatedSprite2D") as AnimatedSprite2D
-		marcador.play("default")
-		_concluir_saida_depois_da_animacao(marcador)
-		return
-	_concluir_saida_depois_da_animacao(null)
+	M3.play("default")
+	_concluir_saida_depois_da_animacao(M3)
 
 
 func _concluir_saida_depois_da_animacao(marcador: AnimatedSprite2D) -> void:
@@ -360,13 +381,6 @@ func _concluir_saida_depois_da_animacao(marcador: AnimatedSprite2D) -> void:
 	_pensar("pos_saida_1", "Eu tenho que investigar isso.")
 	_pensar("pos_saida_2", "Talvez eu deveria ir na sala do escritório (3º andar)")
 	_save_progress_and_checkpoint()
-
-
-func _hide_after_completion() -> void:
-	await get_tree().create_timer(5.0, false).timeout
-
-	if is_inside_tree():
-		hide()
 
 
 func _save_progress_and_checkpoint() -> void:
@@ -460,6 +474,8 @@ func _is_saved_fire_extinguished(fire_save_id: String) -> bool:
 func _apply_saved_visuals() -> void:
 	M1.stop()
 	M2.stop()
+	M3.stop()
+	M4.stop()
 
 	M1.frame = 0
 	M2.frame = 0
@@ -469,6 +485,10 @@ func _apply_saved_visuals() -> void:
 
 	if M2_feito:
 		_set_completed_frame(M2)
+	if _todos_sairam:
+		_set_completed_frame(M3)
+	if _chegou_terceiro_andar:
+		_set_completed_frame(M4)
 
 
 func _set_completed_frame(marker: AnimatedSprite2D) -> void:

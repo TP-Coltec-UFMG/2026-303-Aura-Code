@@ -812,6 +812,7 @@ frame = 7
 
 [node name="QUEST_MISSION" type="CanvasLayer" parent="." unique_id=1686386730 groups=["alto_contraste"]]
 script = ExtResource("18_h0r3n")
+save_id = null
 
 [node name="ColorRect" type="ColorRect" parent="QUEST_MISSION" unique_id=896148046]
 offset_left = 374.0

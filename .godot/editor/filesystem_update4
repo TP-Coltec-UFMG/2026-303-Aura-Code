@@ -5,3 +5,6 @@ res://Scripts/Objects/Button/animated_button.gd
 res://TelaMorte/morreu.tscn
 res://Scenes/andar_hall.tscn
 res://Scenes/scripts/quest_mission.gd
+res://Scenes/scripts/base_scene.gd
+res://Scenes/andar_escritorio.tscn
+res://Scenes/quest_mission_andar_escritorio.gd

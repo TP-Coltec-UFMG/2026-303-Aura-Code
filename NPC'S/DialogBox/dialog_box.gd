@@ -52,6 +52,7 @@ func _type_text(text: String) -> void:
 func _close_dialog():
 	is_typing = true
 
+	@warning_ignore("shadowed_variable")
 	var tween = get_tree().create_tween()
 	tween.tween_property(
 		self,

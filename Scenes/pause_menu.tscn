@@ -1384,19 +1384,19 @@ script = ExtResource("53_846ot")
 action = "use_laptop"
 action_name = "SELECT LAPTOP"
 
-[node name="InputremapUse_faca" type="Button" parent="Controles/VBoxContainer3" unique_id=1540592407 groups=["Botoes_Controles", "alto_contraste"]]
+[node name="InputremapUse_cabo" type="Button" parent="Controles/VBoxContainer3" unique_id=1540592407 groups=["Botoes_Controles", "alto_contraste"]]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("5_6kgnf")
-text = "SELECT KNIFE : 5
+text = "SELECT CABLE : 5
 
 "
 icon = ExtResource("13_htgjv")
 flat = true
 alignment = 0
 script = ExtResource("53_846ot")
-action = "use_faca"
-action_name = "SELECT KNIFE "
+action = "use_cabo"
+action_name = "SELECT CABLE "
 
 [node name="InputremapAscende_Lanterna" type="Button" parent="Controles/VBoxContainer3" unique_id=860974815 groups=["Botoes_Controles", "alto_contraste"]]
 layout_mode = 2
@@ -1515,6 +1515,6 @@ script = ExtResource("51_h3d7w")
 [connection signal="pressed" from="Controles/VBoxContainer3/InputremapSelect_arma" to="Controles/VBoxContainer3/InputremapSelect_arma" method="_on_pressed"]
 [connection signal="pressed" from="Controles/VBoxContainer3/InputremapSelect_card" to="Controles/VBoxContainer3/InputremapSelect_card" method="_on_pressed"]
 [connection signal="pressed" from="Controles/VBoxContainer3/InputremapUse_laptop" to="Controles/VBoxContainer3/InputremapUse_laptop" method="_on_pressed"]
-[connection signal="pressed" from="Controles/VBoxContainer3/InputremapUse_faca" to="Controles/VBoxContainer3/InputremapUse_faca" method="_on_pressed"]
+[connection signal="pressed" from="Controles/VBoxContainer3/InputremapUse_cabo" to="Controles/VBoxContainer3/InputremapUse_cabo" method="_on_pressed"]
 [connection signal="pressed" from="Controles/VBoxContainer3/InputremapAscende_Lanterna" to="Controles/VBoxContainer3/InputremapAscende_Lanterna" method="_on_pressed"]
 [connection signal="pressed" from="Controles/VBoxContainer3/InputremapPause" to="Controles/VBoxContainer3/InputremapPause" method="_on_pressed"]

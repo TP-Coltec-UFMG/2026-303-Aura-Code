@@ -98,6 +98,7 @@ save_id = "laptop_sala_escritorio"
 [node name="Cabo" parent="Coletaveis" unique_id=1884432035 instance=ExtResource("8_b3g1w")]
 position = Vector2(85.99999, 29.000002)
 scale = Vector2(0.34, 0.34)
+save_id = "cabo_sala_escritorio"
 
 [node name="NPCs" type="Node" parent="." unique_id=1711519153]
 

@@ -33,8 +33,28 @@ func _initialize() -> void:
 	var laptop_pickup := get_node_or_null("../Coletaveis/Laptop/PickupComponent") as PickupComponent
 	if laptop_pickup != null and not laptop_pickup.interagiu.is_connected(_on_laptop_collected):
 		laptop_pickup.interagiu.connect(_on_laptop_collected)
+	var cable_pickup := get_node_or_null("../Coletaveis/Cabo/PickupComponent") as PickupComponent
+	if cable_pickup != null and not cable_pickup.interagiu.is_connected(_on_cable_collected):
+		cable_pickup.interagiu.connect(_on_cable_collected)
 
-	var state := SaveGame.office_mission_state(player)
+	var state: Dictionary = SaveGame.office_mission_state(player)
+	var state_migrated := false
+	if (
+		player.inventory.get_item_on_inventary("laptop")
+		or SaveGame.is_object_collected("laptop_sala_escritorio")
+	):
+		if not bool(state.get("office_laptop_collected", false)):
+			state["office_laptop_collected"] = true
+			state_migrated = true
+	if (
+		player.inventory.get_item_on_inventary("cabo")
+		or SaveGame.is_object_collected("cabo_sala_escritorio")
+	):
+		if not bool(state.get("office_cable_collected", false)):
+			state["office_cable_collected"] = true
+			state_migrated = true
+	if state_migrated:
+		SaveGame.save_global_state("hall_quest_01", state)
 	npc = get_node_or_null("../NPCs/NPC1") as Node2D
 	if bool(state.get("office_npc_left_for_data_center", false)):
 		if is_instance_valid(npc):
@@ -61,7 +81,7 @@ func _initialize() -> void:
 
 
 func _restore_sequence() -> void:
-	var state := SaveGame.office_mission_state(player)
+	var state: Dictionary = SaveGame.office_mission_state(player)
 	var arrived := bool(state.get("office_npc_arrived", false))
 	var revealed := bool(state.get("office_npc_revealed", false))
 	var shout_finished := bool(state.get("office_npc_shout_finished", false))
@@ -107,7 +127,7 @@ func _restore_sequence() -> void:
 func _on_player_thought_finished(id: String) -> void:
 	if id != PLAYER_QUESTION_ID:
 		return
-	var state := SaveGame.office_mission_state(player)
+	var state: Dictionary = SaveGame.office_mission_state(player)
 	state["office_question_finished"] = true
 	SaveGame.save_global_state("hall_quest_01", state)
 	_save_checkpoint()
@@ -122,7 +142,7 @@ func _schedule_npc_reveal() -> void:
 	reveal_scheduled = false
 	if not _is_current_office():
 		return
-	var state := SaveGame.office_mission_state(player)
+	var state: Dictionary = SaveGame.office_mission_state(player)
 	if bool(state.get("office_npc_revealed", false)):
 		return
 	_show_npc()
@@ -135,7 +155,7 @@ func _schedule_npc_reveal() -> void:
 func _on_npc_path_completed(finished_path: NPCPath) -> void:
 	if not _is_current_office():
 		return
-	var state := SaveGame.office_mission_state(player)
+	var state: Dictionary = SaveGame.office_mission_state(player)
 	if finished_path == npc_return_path:
 		state["office_npc_left_for_data_center"] = true
 		SaveGame.save_global_state("hall_quest_01", state)
@@ -154,7 +174,7 @@ func _on_npc_path_completed(finished_path: NPCPath) -> void:
 func _npc_shout() -> void:
 	if shout_running or not _is_current_office():
 		return
-	var state := SaveGame.office_mission_state(player)
+	var state: Dictionary = SaveGame.office_mission_state(player)
 	if bool(state.get("office_npc_shout_finished", false)):
 		npc.call("set_dialog_enabled", true)
 		if bool(state.get("office_dialog_finished", false)):
@@ -178,7 +198,7 @@ func _npc_shout() -> void:
 func _on_dialog_finished(dialog_id: String) -> void:
 	if dialog_id != NPC_DIALOG_ID or not _is_current_office():
 		return
-	var state := SaveGame.office_mission_state(player)
+	var state: Dictionary = SaveGame.office_mission_state(player)
 	state["office_dialog_finished"] = true
 	state["office_npc_return_started"] = true
 	SaveGame.save_global_state("hall_quest_01", state)
@@ -191,11 +211,25 @@ func _on_dialog_finished(dialog_id: String) -> void:
 func _on_laptop_collected() -> void:
 	if not _is_current_office():
 		return
+	var state: Dictionary = SaveGame.office_mission_state(player)
+	state["office_laptop_collected"] = true
+	SaveGame.save_global_state("hall_quest_01", state)
+	_show_find_cable_task(bool(state.get("office_cable_collected", false)))
 	player.balao_de_pensamento.enfileirar(LAPTOP_FOUND_ID, "Achei um laptop")
 	player.balao_de_pensamento.enfileirar(
 		LAPTOP_CABLE_HINT_ID,
 		"Com um cabo eu consigo hackear a porta!"
 	)
+
+
+func _on_cable_collected() -> void:
+	if not _is_current_office():
+		return
+	var state: Dictionary = SaveGame.office_mission_state(player)
+	state["office_cable_collected"] = true
+	SaveGame.save_global_state("hall_quest_01", state)
+	if bool(state.get("office_laptop_collected", false)):
+		_show_find_cable_task(true, true)
 
 
 func _show_talk_task(completed: bool, animate: bool = false) -> void:
@@ -207,7 +241,25 @@ func _show_talk_task(completed: bool, animate: bool = false) -> void:
 func _show_boss_room_access_task() -> void:
 	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
 	if quest_ui != null:
-		quest_ui.show_find_boss_room_access_task()
+		var state: Dictionary = SaveGame.office_mission_state(player)
+		if bool(state.get("office_laptop_collected", false)):
+			quest_ui.show_boss_room_and_cable_tasks(
+				bool(state.get("office_boss_room_access_found", false)),
+				bool(state.get("office_cable_collected", false))
+			)
+		else:
+			quest_ui.show_find_boss_room_access_task()
+
+
+func _show_find_cable_task(completed: bool, animate: bool = false) -> void:
+	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
+	if quest_ui != null:
+		var state: Dictionary = SaveGame.office_mission_state(player)
+		quest_ui.show_boss_room_and_cable_tasks(
+			bool(state.get("office_boss_room_access_found", false)),
+			completed,
+			animate
+		)
 
 
 func _show_npc() -> void:

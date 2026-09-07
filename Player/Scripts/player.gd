@@ -40,7 +40,7 @@ var usando_lanterna: bool = false
 var usando_arma: bool = false
 var usando_cartao: bool = false
 var usando_laptop: bool = false
-var usando_faca: bool = false
+var usando_cabo: bool = false
 var usando_extintor: bool = false
 var empurrando: bool = false
 
@@ -144,7 +144,7 @@ func load_checkpoint_state(checkpoint_state: Dictionary) -> void:
 	usando_arma = false
 	usando_cartao = false
 	usando_laptop = false
-	usando_faca = false
+	usando_cabo = false
 	usando_extintor = false
 	inventory.set_equipped_item("")
 
@@ -348,7 +348,7 @@ func _on_grab_right_body_exited(body: Node2D) -> void:
 		objetos_grab_right.erase(objeto)
 
 func usando_item_com_mira() -> bool:
-	return usando_lanterna or usando_arma or usando_extintor or usando_faca
+	return usando_lanterna or usando_arma or usando_extintor
 
 func GetMouseCardinalDirection() -> Vector2:
 	var mouse_offset: Vector2 = get_global_mouse_position() - global_position
@@ -445,7 +445,7 @@ func reset_sprite_player() -> void:
 	usando_arma = false
 	usando_cartao = false
 	usando_laptop = false
-	usando_faca = false
+	usando_cabo = false
 	usando_extintor = false
 	inventory.set_equipped_item("")
 	soltar_objeto()
@@ -525,16 +525,16 @@ func _input(event: InputEvent) -> void:
 			$Sprite2D.texture = preload("res://Player/Sprites/Alex_com_laptop16x16.png")
 			
 			
-	if event.is_action_pressed("use_faca") and inventory.get_item_on_inventary("faca"):
-		var faca = inventory.get_item_control("faca")
-		faca.set_player(self)
-		if usando_faca:
+	if event.is_action_pressed("use_cabo") and inventory.get_item_on_inventary("cabo"):
+		var cabo = inventory.get_item_control("cabo")
+		cabo.set_player(self)
+		if usando_cabo:
 			reset_sprite_player()
 		else:
 			reset_sprite_player()
-			usando_faca = true
-			inventory.set_equipped_item("faca")
-			$Sprite2D.texture = preload("res://Player/Sprites/Alex_com_faca16x16.png")
+			usando_cabo = true
+			inventory.set_equipped_item("cabo")
+			$Sprite2D.texture = preload("res://Player/Sprites/Alex_16x16_com_cabo.png")
 			
 			
 	if event.is_action_pressed("empurrar") and not usando_algum_item():
@@ -554,7 +554,7 @@ func put_conhecimento() -> void:
 	inteligencia.value += 10
 
 func usando_algum_item() -> bool:
-	if usando_arma or usando_cartao or usando_faca or usando_lanterna or usando_laptop or usando_extintor:
+	if usando_arma or usando_cartao or usando_cabo or usando_lanterna or usando_laptop or usando_extintor:
 		return true
 	return false
 

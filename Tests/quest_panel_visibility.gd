@@ -142,10 +142,46 @@ func _run() -> void:
 	laptop.get_node("PickupComponent").coletar()
 	await get_tree().process_frame
 	_check(player.inventory.get_item_on_inventary("laptop"), "laptop coletado entra no inventário")
+	_check(bool(SaveGame.office_mission_state().get("office_laptop_collected", false)), "coleta do laptop fica registrada na missão")
+	_check(painel.rows[2].visible, "tarefa principal continua visível depois de coletar o laptop")
+	_check((painel.rows[2].get_node("Label3") as Label).text == "ENCONTRE UMA FORMA DE\nENTRAR NA SALA DO CHEFE", "coleta do laptop mantém a tarefa de entrar na sala do chefe")
+	_check(painel.markers[2].frame == 0, "tarefa de entrar na sala do chefe continua pendente")
+	_check((painel.rows[3].get_node("Label3") as Label).text == "ENCONTRE UM CABO", "coleta do laptop cria a tarefa ENCONTRE UM CABO")
+	_check(painel.markers[3].frame == 0, "tarefa do cabo começa pendente")
 	_check(player.balao_de_pensamento.tem_pensamento("office:laptop_found"), "coleta do laptop agenda Achei um laptop")
 	_check(player.balao_de_pensamento.tem_pensamento("office:laptop_cable_hint"), "coleta do laptop agenda a dica do cabo")
 	_check(player.balao_de_pensamento.label.text == "Achei um laptop", "primeiro pensamento identifica o laptop")
 	await _finish_thought(player.balao_de_pensamento)
 	_check(player.balao_de_pensamento.label.text == "Com um cabo eu consigo hackear a porta!", "segundo pensamento explica como hackear a porta")
+	await _finish_thought(player.balao_de_pensamento)
+	var cable := get_tree().current_scene.get_node("Coletaveis/Cabo")
+	cable.get_node("PickupComponent").coletar()
+	await get_tree().process_frame
+	_check(player.inventory.get_item_on_inventary("cabo"), "cabo coletado entra no antigo slot da faca")
+	_check(not player.inventory.get_item_on_inventary("faca"), "inventário não mantém o identificador antigo da faca")
+	_check(bool(SaveGame.office_mission_state().get("office_cable_collected", false)), "coleta do cabo fica registrada na missão")
+	_check(painel.rows[2].visible and painel.markers[2].frame == 0, "coleta do cabo mantém a tarefa principal visível e pendente")
+	_check((painel.rows[3].get_node("Label3") as Label).text == "ENCONTRE UM CABO", "painel mantém a tarefa do cabo ao concluir")
+	await get_tree().create_timer(0.3).timeout
+	_check(painel.markers[3].frame == 1, "coleta do cabo conclui a tarefa")
+	painel.refresh_saved_state()
+	_check(painel.rows[2].visible and painel.markers[2].frame == 0, "save restaura a tarefa principal visível e pendente")
+	_check(painel.rows[3].visible and painel.markers[3].frame == 1, "save restaura a tarefa do cabo concluída")
+	_check(InputMap.has_action("use_cabo") and not InputMap.has_action("use_faca"), "controle da faca foi substituído por use_cabo")
+	await _send_key(KEY_3)
+	_check(player.usando_cabo and player.inventory.equipped_item_id == "cabo", "tecla 3 equipa o cabo")
+	_check(not player.usando_item_com_mira(), "cabo equipado não ativa a mira pelo mouse")
+	_check(player.sprite.texture.resource_path.ends_with("Alex_16x16_com_cabo.png"), "cabo usa a sprite própria do Alex com o cabo")
+	scene_manager.change_scene(player, "andar_hall")
+	await get_tree().scene_changed
+	await get_tree().process_frame
+	scene_manager.change_scene(player, "andar_escritorio")
+	await get_tree().scene_changed
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(painel.rows[2].visible and painel.markers[2].frame == 0, "reentrada no escritório restaura a tarefa principal pendente")
+	_check((painel.rows[2].get_node("Label3") as Label).text == "ENCONTRE UMA FORMA DE\nENTRAR NA SALA DO CHEFE", "reentrada mantém a tarefa atual da sala do chefe")
+	_check(painel.rows[3].visible and painel.markers[3].frame == 1, "reentrada restaura a tarefa concluída do cabo")
+	_check((painel.rows[3].get_node("Label3") as Label).text == "ENCONTRE UM CABO", "reentrada não volta para a tarefa de ir ao terceiro andar")
 	print("RESULT: ", failures, " failures")
 	get_tree().quit(1 if failures > 0 else 0)

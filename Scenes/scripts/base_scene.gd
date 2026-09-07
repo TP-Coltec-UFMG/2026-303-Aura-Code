@@ -133,7 +133,7 @@ func _registrar_chegada_escritorio() -> void:
 		if primeira_chegada:
 			quest_ui.complete_third_floor()
 		else:
-			quest_ui.show_only_third_floor_task(true)
+			quest_ui.refresh_saved_state()
 	var balao := player.balao_de_pensamento
 	var pensamento_novo: bool = not balao.tem_pensamento(OFFICE_EMPTY_THOUGHT_ID)
 	if pensamento_novo:

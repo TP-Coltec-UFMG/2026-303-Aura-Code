@@ -14,7 +14,7 @@ const REMAPPABLE_ACTIONS: PackedStringArray = [
 	"use_arma",
 	"use_cartao",
 	"use_laptop",
-	"use_faca",
+	"use_cabo",
 	"use_extintor",
 	"acende_lanterna",
 	"usar_extintor",
@@ -188,7 +188,10 @@ func _apply_input_bindings(value: Variant) -> void:
 	if not value is Dictionary:
 		return
 
-	var bindings: Dictionary = value
+	var bindings: Dictionary = value.duplicate(true)
+	# Migra a tecla personalizada de configurações salvas antes da troca do item.
+	if not bindings.has("use_cabo") and bindings.has("use_faca"):
+		bindings["use_cabo"] = bindings["use_faca"]
 
 	for action_key: Variant in bindings:
 		var action_name := str(action_key)

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccsftyhhdyqqh"
-path="res://.godot/imported/Alex_16x16.png-89462274f2a2226fed9efa0756e5c56d.ctex"
+uid="uid://bg5cnwapsa74f"
+path="res://.godot/imported/Alex_16x16_com_cabo.png-56a47221d61ab60b6f8739b565e5d797.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Player/Sprites/Alex_16x16.png"
-dest_files=["res://.godot/imported/Alex_16x16.png-89462274f2a2226fed9efa0756e5c56d.ctex"]
+source_file="res://Player/Sprites/Alex_16x16_com_cabo.png"
+dest_files=["res://.godot/imported/Alex_16x16_com_cabo.png-56a47221d61ab60b6f8739b565e5d797.ctex"]
 
 [params]
 

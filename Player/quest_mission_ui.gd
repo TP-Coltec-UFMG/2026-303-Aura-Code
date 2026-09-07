@@ -103,18 +103,39 @@ func show_find_boss_room_access_task(completed: bool = false, animate: bool = fa
 	set_panel_visible(true)
 
 
+func show_boss_room_and_cable_tasks(
+	boss_room_completed: bool = false,
+	cable_completed: bool = false,
+	animate_cable: bool = false
+) -> void:
+	for index in range(rows.size()):
+		set_task_visible(index, index == 2 or index == 3)
+	set_task_text(2, "ENCONTRE UMA FORMA DE\nENTRAR NA SALA DO CHEFE")
+	set_task_completed(2, boss_room_completed)
+	set_task_text(3, "ENCONTRE UM CABO")
+	set_task_completed(3, cable_completed, animate_cable)
+	set_panel_visible(true)
+
+
 func refresh_saved_state() -> void:
-	var state := SaveGame.office_mission_state(get_parent() as Player)
+	var state: Dictionary = SaveGame.office_mission_state(get_parent() as Player)
 	var unlocked := bool(state.get("elevator_third_floor_unlocked", false))
 	var arrived := bool(state.get("arrived_third_floor", false))
 	var npc_ready := bool(state.get("office_npc_shout_finished", false))
 	var dialog_finished := bool(state.get("office_dialog_finished", false))
 	var boss_room_access_found := bool(state.get("office_boss_room_access_found", false))
+	var laptop_collected := bool(state.get("office_laptop_collected", false))
+	var cable_collected := bool(state.get("office_cable_collected", false))
 	if unlocked:
 		set_task_completed(0, true)
 		set_task_completed(1, true)
 		set_task_completed(2, true)
-		if dialog_finished:
+		if laptop_collected:
+			show_boss_room_and_cable_tasks(
+				boss_room_access_found,
+				cable_collected
+			)
+		elif dialog_finished:
 			show_find_boss_room_access_task(boss_room_access_found)
 		elif npc_ready:
 			show_talk_to_npc_task(false)

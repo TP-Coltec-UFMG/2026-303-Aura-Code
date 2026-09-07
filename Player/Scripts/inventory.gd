@@ -112,11 +112,12 @@ func get_save_state() -> Dictionary:
 
 
 func load_save_state(inventario_salvo: Dictionary) -> void:
-	for item_id in inventario_salvo:
+	for saved_item_id in inventario_salvo:
+		var item_id := "cabo" if str(saved_item_id) == "faca" else str(saved_item_id)
 		if not slots_por_item.has(item_id):
 			continue
 
-		var saved_item: Variant = inventario_salvo[item_id]
+		var saved_item: Variant = inventario_salvo[saved_item_id]
 
 		var scene_path: String = ""
 		var item_state: Dictionary = {}
@@ -140,6 +141,8 @@ func load_save_state(inventario_salvo: Dictionary) -> void:
 
 		if scene_path.is_empty():
 			continue
+		if scene_path == "res://Objects/faca.tscn":
+			scene_path = "res://Objects/cabo.tscn"
 
 		var item_scene: PackedScene = load(scene_path)
 

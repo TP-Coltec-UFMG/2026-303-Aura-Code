@@ -19,7 +19,7 @@ const CONTROL_GROUPS = [
 			{"id": "use_arma", "label": "ARMA"},
 			{"id": "use_cartao", "label": "CARTÃO"},
 			{"id": "use_laptop", "label": "LAPTOP"},
-			{"id": "use_faca", "label": "FACA"},
+			{"id": "use_cabo", "label": "CABO"},
 			{"id": "use_extintor", "label": "EXTINTOR"},
 		]
 	},

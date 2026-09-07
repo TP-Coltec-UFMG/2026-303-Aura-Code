@@ -1,6 +1,6 @@
 extends Node2D
 
-@export var save_id: String = "faca"
+@export var save_id: String = "cabo"
 var no_inventario: bool = false
 
 @onready var sprite_2d: Sprite2D = $Sprite2D

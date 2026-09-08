@@ -20,7 +20,7 @@
 [ext_resource type="Texture2D" uid="uid://dktm4jsa4ifjm" path="res://TileMaps/Andar_DataCenter/sprites/sprite_09.png" id="18_5rugl"]
 [ext_resource type="Texture2D" uid="uid://dwugqc0i02mm3" path="res://TileMaps/Andar_DataCenter/sprites/sprite_01.png" id="19_02t7k"]
 [ext_resource type="Texture2D" uid="uid://dxa8cb1youij" path="res://TileMaps/Andar_DataCenter/sprites/sprite_00.png" id="20_ej6xx"]
-[ext_resource type="Texture2D" uid="uid://dorhmxng4fhoy" path="res://TileMaps/Andar_DataCenter/sprites/sprite_03.png" id="21_5ecoq"]
+[ext_resource type="Texture2D" uid="uid://dftidlyfwnosw" path="res://6zO0nB9uYTwfdpAHdmP2zAWS3FrDbIoXjv8PigSrQNJPQm0AAAAASUVORK5CYII.png" id="21_4kfbx"]
 [ext_resource type="Texture2D" uid="uid://dp1kibirai71v" path="res://TileMaps/Andar_DataCenter/sprites/sprite_04.png" id="22_smjml"]
 [ext_resource type="Texture2D" uid="uid://bx4ry7f6ifbiy" path="res://TileMaps/Andar_DataCenter/sprites/data47.png" id="23_ar7e3"]
 [ext_resource type="Texture2D" uid="uid://bo122jemav3om" path="res://TileMaps/Andar_DataCenter/sprites/data28.png" id="24_0uy6l"]
@@ -2635,13 +2635,13 @@ texture = ExtResource("20_ej6xx")
 
 [node name="Sprite07" type="Sprite2D" parent="." unique_id=708993492]
 position = Vector2(153.6, 126.600006)
-scale = Vector2(1.3, 1.3)
-texture = ExtResource("21_5ecoq")
+scale = Vector2(0.04, 0.04)
+texture = ExtResource("21_4kfbx")
 
 [node name="Sprite08" type="Sprite2D" parent="." unique_id=979882505]
 position = Vector2(229.6, 126.600006)
-scale = Vector2(1.3, 1.3)
-texture = ExtResource("21_5ecoq")
+scale = Vector2(0.04, 0.04)
+texture = ExtResource("21_4kfbx")
 
 [node name="Sprite13" type="Sprite2D" parent="." unique_id=872796460]
 position = Vector2(20, 44)
@@ -2941,6 +2941,7 @@ position = Vector2(161, 74)
 shape = SubResource("RectangleShape2D_4kfbx")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D5" unique_id=1497868141]
+visible = false
 position = Vector2(240, 74)
 shape = SubResource("RectangleShape2D_4kfbx")
 

@@ -1,3 +1,6 @@
+ColorRect
+SubViewportContainer
+SubViewport
 HBoxContainer
 PointLight2D
 Line2D

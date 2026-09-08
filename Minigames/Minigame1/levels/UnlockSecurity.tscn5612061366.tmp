@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://d30scnxgs1atq"]
+
+[ext_resource type="Script" uid="uid://chnkudlnq45rh" path="res://Minigames/Comum/fase.gd" id="1"]
+[ext_resource type="Script" uid="uid://3lnxsl64h0qt" path="res://Minigames/Comum/piso.gd" id="2"]
+[ext_resource type="Script" uid="uid://gx0y32hhvkec" path="res://Minigames/Comum/parede.gd" id="3"]
+[ext_resource type="Script" uid="uid://c836vu7ei1f81" path="res://Minigames/Comum/jogador.gd" id="4"]
+[ext_resource type="Script" uid="uid://b74gwgpse0ii8" path="res://Minigames/Comum/objetivo.gd" id="5"]
+[ext_resource type="Script" uid="uid://c0nmta50t4xlo" path="res://Minigames/Comum/sensor.gd" id="6"]
+
+[node name="Fase" type="Node2D" unique_id=974993988]
+position = Vector2(48, 31)
+scale = Vector2(0.79, 0.79)
+script = ExtResource("1")
+nome_fase = "Sensores cruzados"
+dica = "Alcance o terminal verde. Espere os sensores girarem e use o bloco central como cobertura. Vermelho detecta; amarelo avisa."
+
+[node name="Arena" type="Node2D" parent="." unique_id=2146992383]
+clip_children = 2
+position = Vector2(-3, 0)
+script = ExtResource("2")
+
+[node name="Parede01" type="StaticBody2D" parent="Arena" unique_id=961875712]
+collision_mask = 0
+script = ExtResource("3")
+
+[node name="Forma" type="CollisionPolygon2D" parent="Arena/Parede01" unique_id=2033871967]
+polygon = PackedVector2Array(306, 0, 306, 87, 318, 87, 318, 0)
+
+[node name="Parede02" type="StaticBody2D" parent="Arena" unique_id=771493415]
+collision_mask = 0
+script = ExtResource("3")
+
+[node name="Forma" type="CollisionPolygon2D" parent="Arena/Parede02" unique_id=208747791]
+polygon = PackedVector2Array(0, 212, 226, 212, 226, 64, 0, 64)
+
+[node name="Parede03" type="StaticBody2D" parent="Arena" unique_id=731473161]
+collision_mask = 0
+script = ExtResource("3")
+
+[node name="Forma" type="CollisionPolygon2D" parent="Arena/Parede03" unique_id=685706608]
+polygon = PackedVector2Array(306, 270, 318, 270, 318, 183, 306, 183)
+
+[node name="Limite0" type="StaticBody2D" parent="Arena" unique_id=253203681]
+collision_mask = 0
+
+[node name="Forma" type="CollisionPolygon2D" parent="Arena/Limite0" unique_id=1761781449]
+polygon = PackedVector2Array(-8, -8, 488, -8, 488, 0, -8, 0)
+
+[node name="Limite1" type="StaticBody2D" parent="Arena" unique_id=603813873]
+collision_mask = 0
+
+[node name="Forma" type="CollisionPolygon2D" parent="Arena/Limite1" unique_id=1859169811]
+polygon = PackedVector2Array(-8, 270, 488, 270, 488, 278, -8, 278)
+
+[node name="Limite2" type="StaticBody2D" parent="Arena" unique_id=716194538]
+collision_mask = 0
+
+[node name="Forma" type="CollisionPolygon2D" parent="Arena/Limite2" unique_id=699238047]
+polygon = PackedVector2Array(-8, 0, 0, 0, 0, 270, -8, 270)
+
+[node name="Limite3" type="StaticBody2D" parent="Arena" unique_id=1383419413]
+collision_mask = 0
+
+[node name="Forma" type="CollisionPolygon2D" parent="Arena/Limite3" unique_id=1453861783]
+polygon = PackedVector2Array(480, 0, 488, 0, 488, 270, 480, 270)
+
+[node name="Jogador" type="CharacterBody2D" parent="Arena" unique_id=1789786632]
+z_index = 3
+position = Vector2(61, 245)
+script = ExtResource("4")
+
+[node name="Objetivo" type="Area2D" parent="Arena" unique_id=848780764]
+z_index = 2
+position = Vector2(30, 244)
+script = ExtResource("5")
+
+[node name="Sensor1" type="Node2D" parent="Arena" unique_id=1468775801]
+position = Vector2(432, 42)
+script = ExtResource("6")
+angulo_inicial = 235
+angulo_final = 285
+duracao_giro = 3.2
+alcance = 246
+
+[node name="Sensor2" type="Node2D" parent="Arena" unique_id=1766097192]
+position = Vector2(432, 228)
+script = ExtResource("6")
+angulo_inicial = 255
+angulo_final = 310
+duracao_giro = 3.2
+defasagem = 1.4
+alcance = 246
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1348889344]
+z_index = -5
+offset_left = -108.860756
+offset_top = -74.68354
+offset_right = 617.7215
+offset_bottom = 345.5696
+color = Color(1.0829419e-07, 0.27500194, 0.22001508, 1)

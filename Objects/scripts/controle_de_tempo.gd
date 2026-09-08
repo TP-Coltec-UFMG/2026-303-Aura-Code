@@ -177,7 +177,7 @@ func _on_tempo_esgotado() -> void:
 	MusicController._stop_som_alarme()
 	$Timer.start()
 	await $Timer.timeout
-	get_tree().change_scene_to_file("res://cutscene_final_1.tscn")
+	get_tree().change_scene_to_file("res://Cutscenes/cutscene_final_1.tscn")
 
 
 func _on_man_player_jogador_morreu() -> void:

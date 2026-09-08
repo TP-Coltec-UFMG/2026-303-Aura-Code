@@ -1,15 +1,2 @@
-res://Scenes/andar_escritorio.tscn
-res://shaders/pause_menu.gdshader
-res://Player/quest_mission_ui.gd
-res://Scenes/scripts/office_intro_controller.gd
-res://Tests/quest_panel_visibility.gd
-res://Objects/faca.tscn
-res://Player/inventory.tscn
-res://Player/Scripts/inventory.gd
 res://Objects/cabo.tscn
-res://Objects/scripts/cabo.gd
-res://Player/Scripts/player.gd
-res://Scenes/scripts/controles.gd
-res://Scripts/Data/save/SaveLoad.gd
-res://Scenes/scripts/base_scene.gd
-res://NPC'S/DialogBox/dialog_box.gd
+res://shaders/pause_menu.gdshader

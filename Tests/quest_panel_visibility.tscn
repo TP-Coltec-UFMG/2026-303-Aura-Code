@@ -1,6 +1,0 @@
-[gd_scene format=3]
-
-[ext_resource type="Script" path="res://Tests/quest_panel_visibility.gd" id="1"]
-
-[node name="QuestPanelVisibilityTest" type="Node"]
-script = ExtResource("1")

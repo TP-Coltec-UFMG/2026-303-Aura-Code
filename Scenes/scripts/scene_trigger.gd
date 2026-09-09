@@ -60,6 +60,7 @@ func usar_elevador(andar: int) -> void:
 		return
 	if andar != andar_atual and eh_elevador:
 		if dentro_da_area:
+			_concluir_tarefa_do_sexto_andar(andar)
 			_ocultar_paineis_tarefas()
 			body_p.inventory.hide()
 			$Timer.start()
@@ -103,25 +104,78 @@ func _input(event: InputEvent) -> void:
 		_ocultar_paineis_tarefas()
 		get_tree().paused = true
 
-	if event.is_action_pressed("interact") and dentro_da_area and body_p.inventory.get_item_on_inventary("cartao") and body_p.usando_cartao and not eh_elevador:
-		var tipo_cartao = body_p.inventory.get_item_control("cartao").tipo
-		var tipo_sala_acessando
-		
-		if connected_scene.containsn("chefe"):
-			tipo_sala_acessando = 3
-		elif connected_scene.containsn("forte"):
-			tipo_sala_acessando = 2
-		else:
-			tipo_sala_acessando = 1
-		
-		if tipo_cartao >= tipo_sala_acessando:
+	if event.is_action_pressed("interact") and dentro_da_area and not eh_elevador:
+		if _tem_cartao_compativel() or _sala_do_chefe_foi_hackeada():
 			acesso_liberado.play()
-			await  acesso_liberado.finished
+			await acesso_liberado.finished
 			if dentro_da_area:
+				_preparar_saida_da_sala_do_chefe()
+				_registrar_acesso_a_sala_do_chefe()
 				scene_manager.change_scene(body_p, connected_scene)
+		elif _pode_hackear_sala_do_chefe():
+			Progresso.iniciar_hack_da_sala_do_chefe(body_p)
 		else:
 			aceso_negado.play()
 			print("Acesso Negado")
+
+
+func _tem_cartao_compativel() -> bool:
+	if not body_p.inventory.get_item_on_inventary("cartao") or not body_p.usando_cartao:
+		return false
+	var tipo_cartao: int = int(body_p.inventory.get_item_control("cartao").tipo)
+	var tipo_sala_acessando := 1
+	if connected_scene.containsn("chefe"):
+		tipo_sala_acessando = 3
+	elif connected_scene.containsn("forte"):
+		tipo_sala_acessando = 2
+	return tipo_cartao >= tipo_sala_acessando
+
+
+func _pode_hackear_sala_do_chefe() -> bool:
+	return (
+		connected_scene.containsn("chefe")
+		and body_p.inventory.get_item_on_inventary("laptop")
+		and body_p.inventory.get_item_on_inventary("cabo")
+		and not _sala_do_chefe_foi_hackeada()
+	)
+
+
+func _sala_do_chefe_foi_hackeada() -> bool:
+	return (
+		connected_scene.containsn("chefe")
+		and bool(SaveGame.office_mission_state(body_p).get("office_boss_room_hacked", false))
+	)
+
+
+func _registrar_acesso_a_sala_do_chefe() -> void:
+	if not connected_scene.containsn("chefe"):
+		return
+	var estado := SaveGame.office_mission_state(body_p)
+	estado["office_boss_room_access_found"] = true
+	SaveGame.save_global_state("hall_quest_01", estado)
+
+
+func _preparar_saida_da_sala_do_chefe() -> void:
+	if connected_scene != "andar_escritorio":
+		return
+	var scene := get_parent()
+	if scene != null and scene.has_method("prepare_return_to_office"):
+		scene.call("prepare_return_to_office")
+
+
+func _concluir_tarefa_do_sexto_andar(andar: int) -> void:
+	if andar != 6:
+		return
+	var state: Dictionary = SaveGame.office_mission_state(body_p)
+	if not bool(state.get("office_data_center_task_active", false)):
+		return
+	if bool(state.get("office_data_center_task_completed", false)):
+		return
+	state["office_data_center_task_completed"] = true
+	SaveGame.save_global_state("hall_quest_01", state)
+	var quest_ui := _obter_painel_tarefas()
+	if quest_ui != null:
+		quest_ui.show_go_to_sixth_floor_task(true, true)
 			
 
 

@@ -29,7 +29,7 @@ script = ExtResource("1")
 offset_left = 374.0
 offset_top = 35.0
 offset_right = 480.0
-offset_bottom = 108.0
+offset_bottom = 128.0
 color = Color(0.094685, 0.094685, 0.094685, 1)
 
 [node name="Label2" type="Label" parent="." groups=["alto_contraste"]]
@@ -105,6 +105,28 @@ layout_mode = 2
 text = "HACKEIE A SALA DO CHEFE!"
 label_settings = SubResource("LabelSettingsTask")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer5"]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFramesCheck")
+
+[node name="HBoxContainer6" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer6" groups=["alto_contraste"]]
+layout_mode = 2
+text = "PEGUE O CARTÃO DO CHEFE"
+label_settings = SubResource("LabelSettingsTask")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer6"]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFramesCheck")
+
+[node name="HBoxContainer7" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer7" groups=["alto_contraste"]]
+layout_mode = 2
+text = "VÁ PARA O SEXTO ANDAR"
+label_settings = SubResource("LabelSettingsTask")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer7"]
 position = Vector2(-8, 6)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFramesCheck")

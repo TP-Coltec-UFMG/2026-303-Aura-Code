@@ -1,2 +1,10 @@
 res://Player/quest_mission_ui.gd
 res://Scenes/scripts/office_intro_controller.gd
+res://Minigames/Comum/fase.gd
+res://Minigames/Comum/progresso.gd
+res://Scenes/scripts/base_scene.gd
+res://Scenes/scripts/scene_trigger.gd
+res://Scenes/andar_escritorio.tscn
+res://shaders/pause_menu.gdshader
+res://Scenes/sala_chefe.tscn
+res://Scenes/scripts/sala_chefe.gd

@@ -138,7 +138,10 @@ func _registrar_chegada_escritorio() -> void:
 	var pensamento_novo: bool = not balao.tem_pensamento(OFFICE_EMPTY_THOUGHT_ID)
 	if pensamento_novo:
 		_agendar_pensamento_escritorio_vazio()
-	if player.checkpoint_enabled and primeira_chegada:
+	if player.checkpoint_enabled and (
+		primeira_chegada
+		or bool(estado.get("office_boss_room_hacked", false))
+	):
 		SaveGame.create_checkpoint(player)
 
 

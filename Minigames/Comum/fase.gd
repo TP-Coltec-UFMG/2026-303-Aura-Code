@@ -1,5 +1,7 @@
 extends Node2D
 
+const GAME_TIMER_SCENE := preload("res://Objects/controle_de_tempo.tscn")
+
 @export_enum("Vigilância", "Deslizar") var jogo: int = 0
 @export_range(0, 3) var fase: int = 0
 @export var nome_fase: String = "Primeiro acesso"
@@ -10,6 +12,7 @@ var hud: Control
 var modal: Control
 var contador: Label
 var sons: SonsAsimov
+var game_timer: Control
 @onready var jogador = $Arena/Jogador
 @onready var objetivo = $Arena/Objetivo
 signal venceu
@@ -36,6 +39,7 @@ func _ready() -> void:
 	VisualAsimov.icone(hud, 2 if jogo == 0 else 3, 0, Rect2(431, 62, 33, 33))
 	contador = VisualAsimov.texto(hud, "", Rect2(12, 128, 47, 41), 9, VisualAsimov.SUAVE)
 	VisualAsimov.texto(hud, "[R]:\n REFAZER\n\n[ESC]:\n PAUSA", Rect2(432, 146, 47, 79), 8, VisualAsimov.SUAVE)
+	_adicionar_cronometro(camada)
 	var instrucao := "WASD / SETAS: mover    |    Evite os cones vermelhos."
 	if jogo == 1:
 		instrucao = "WASD / SETAS: direção    ESPAÇO: deslizar    Z: desfazer"
@@ -45,6 +49,24 @@ func _ready() -> void:
 	jogador.iniciou_movimento.connect(func(): sons.tocar("passo"))
 	jogador.parou.connect(func(): sons.tocar("toque"))
 	objetivo.alcancado.connect(vencer)
+
+
+func _adicionar_cronometro(camada: CanvasLayer) -> void:
+	game_timer = GAME_TIMER_SCENE.instantiate() as Control
+	game_timer.name = "GameTimer"
+	game_timer.process_mode = Node.PROCESS_MODE_PAUSABLE
+	camada.add_child(game_timer)
+	var icon := game_timer.get_node_or_null("Control") as Control
+	if icon != null:
+		icon.hide()
+	var timer_label := game_timer.get_node_or_null("Label") as Label
+	if timer_label != null:
+		timer_label.anchor_left = 0.0
+		timer_label.anchor_right = 0.0
+		timer_label.offset_left = 345.0
+		timer_label.offset_right = 425.0
+		timer_label.offset_top = 7.0
+		timer_label.offset_bottom = 24.0
 
 
 func _unhandled_key_input(evento: InputEvent) -> void:
@@ -117,6 +139,8 @@ func desfazer_falha() -> void:
 func vencer() -> void:
 	if estado != "jogando": return
 	estado = "venceu"
+	if is_instance_valid(game_timer) and game_timer.has_method("pausar_timer"):
+		game_timer.call("pausar_timer")
 	jogador.habilitado = false
 	for sensor in get_tree().get_nodes_in_group("sensores"):
 		sensor.set_physics_process(false)
@@ -130,4 +154,4 @@ func vencer() -> void:
 	if fase < 3:
 		Progresso.abrir(jogo, fase + 1)
 	else:
-		VisualAsimov.botao(modal, "SAIR DO HACKER", Rect2(110, 154, 261, 22), Progresso.menu).grab_focus()
+		VisualAsimov.botao(modal, Progresso.texto_saida(), Rect2(110, 154, 261, 22), Progresso.menu).grab_focus()

@@ -3,10 +3,14 @@ extends Node
 const PLAYER_QUESTION_ID: String = "office:empty_floor"
 const NPC_SHOUT_ID: String = "office:npc_boss_shout"
 const NPC_DIALOG_ID: String = "office:npc_intro_dialog"
-const LAPTOP_FOUND_ID: String = "office:laptop_found"
-const LAPTOP_CABLE_HINT_ID: String = "office:laptop_cable_hint"
+const LAPTOP_FIRST_FOUND_ID: String = "office:laptop_first_found"
+const LAPTOP_SECOND_FOUND_ID: String = "office:laptop_second_found"
+const CABLE_FIRST_FOUND_ID: String = "office:cable_first_found"
+const CABLE_SECOND_FOUND_ID: String = "office:cable_second_found"
 const BOSS_ROOM_HACK_READY_ID: String = "office:boss_room_hack_ready"
+const DATA_CENTER_FLOOR_ID: String = "office:data_center_floor"
 const NPC_REVEAL_DELAY: float = 2.0
+const DATA_CENTER_PROMPT_DELAY: float = 2.0
 
 var player: Player
 var npc: Node2D
@@ -54,11 +58,19 @@ func _initialize() -> void:
 		if not bool(state.get("office_cable_collected", false)):
 			state["office_cable_collected"] = true
 			state_migrated = true
+	if str(state.get("office_first_hacking_item", "")).is_empty():
+		var laptop_saved := bool(state.get("office_laptop_collected", false))
+		var cable_saved := bool(state.get("office_cable_collected", false))
+		if laptop_saved or cable_saved:
+			state["office_first_hacking_item"] = "cabo" if cable_saved and not laptop_saved else "laptop"
+			state_migrated = true
 	if _unlock_boss_room_hack_task(state):
 		state_migrated = true
 	if state_migrated:
 		SaveGame.save_global_state("hall_quest_01", state)
 	_queue_boss_room_hack_thought(state)
+	if _handle_data_center_task(state):
+		return
 	npc = get_node_or_null("../NPCs/NPC1") as Node2D
 	if bool(state.get("office_npc_left_for_data_center", false)):
 		if is_instance_valid(npc):
@@ -81,6 +93,7 @@ func _initialize() -> void:
 		npc.connect(&"path_completed", _on_npc_path_completed)
 
 	npc.call("set_dialog_enabled", false)
+	_refresh_npc_dialog()
 	_restore_sequence()
 
 
@@ -129,6 +142,14 @@ func _restore_sequence() -> void:
 
 
 func _on_player_thought_finished(id: String) -> void:
+	if id == DATA_CENTER_FLOOR_ID:
+		var data_center_state: Dictionary = SaveGame.office_mission_state(player)
+		data_center_state["office_data_center_task_pending"] = false
+		data_center_state["office_data_center_task_active"] = true
+		SaveGame.save_global_state("hall_quest_01", data_center_state)
+		_show_go_to_sixth_floor_task(bool(data_center_state.get("office_data_center_task_completed", false)))
+		_save_checkpoint()
+		return
 	if id != PLAYER_QUESTION_ID:
 		return
 	var state: Dictionary = SaveGame.office_mission_state(player)
@@ -217,16 +238,14 @@ func _on_laptop_collected() -> void:
 		return
 	var state: Dictionary = SaveGame.office_mission_state(player)
 	state["office_laptop_collected"] = true
+	var laptop_was_first := _register_first_hacking_item(state, "laptop") == "laptop"
 	_unlock_boss_room_hack_task(state)
 	SaveGame.save_global_state("hall_quest_01", state)
-	_show_find_cable_task(
-		bool(state.get("office_cable_collected", false)),
-		bool(state.get("office_hack_boss_room_ready", false))
-	)
-	player.balao_de_pensamento.enfileirar(LAPTOP_FOUND_ID, "Achei um laptop")
+	_show_hacking_item_task(state)
+	_refresh_npc_dialog()
 	player.balao_de_pensamento.enfileirar(
-		LAPTOP_CABLE_HINT_ID,
-		"Com um cabo eu consigo hackear a porta!"
+		LAPTOP_FIRST_FOUND_ID if laptop_was_first else LAPTOP_SECOND_FOUND_ID,
+		"Alguém esqueceu o notebook aqui" if laptop_was_first else "Esqueceram um notebook também"
 	)
 	_queue_boss_room_hack_thought(state)
 
@@ -236,10 +255,15 @@ func _on_cable_collected() -> void:
 		return
 	var state: Dictionary = SaveGame.office_mission_state(player)
 	state["office_cable_collected"] = true
+	var cable_was_first := _register_first_hacking_item(state, "cabo") == "cabo"
 	_unlock_boss_room_hack_task(state)
 	SaveGame.save_global_state("hall_quest_01", state)
-	if bool(state.get("office_laptop_collected", false)):
-		_show_find_cable_task(true, bool(state.get("office_hack_boss_room_ready", false)), true)
+	_show_hacking_item_task(state, not cable_was_first)
+	_refresh_npc_dialog()
+	player.balao_de_pensamento.enfileirar(
+		CABLE_FIRST_FOUND_ID if cable_was_first else CABLE_SECOND_FOUND_ID,
+		"Alguém esqueceu um cabo aqui" if cable_was_first else "Esqueceram um cabo também"
+	)
 	_queue_boss_room_hack_thought(state)
 
 
@@ -253,31 +277,116 @@ func _show_boss_room_access_task() -> void:
 	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
 	if quest_ui != null:
 		var state: Dictionary = SaveGame.office_mission_state(player)
-		if bool(state.get("office_laptop_collected", false)):
+		if (
+			bool(state.get("office_laptop_collected", false))
+			or bool(state.get("office_cable_collected", false))
+		):
 			quest_ui.show_boss_room_and_cable_tasks(
 				bool(state.get("office_boss_room_access_found", false)),
 				bool(state.get("office_cable_collected", false)),
 				false,
-				bool(state.get("office_hack_boss_room_ready", false))
+				bool(state.get("office_hack_boss_room_ready", false)),
+				bool(state.get("office_boss_room_hacked", false)),
+				false,
+				false,
+				str(state.get("office_first_hacking_item", "")) == "cabo"
 			)
 		else:
 			quest_ui.show_find_boss_room_access_task()
 
 
-func _show_find_cable_task(
-	completed: bool,
-	hack_ready: bool = false,
-	animate: bool = false
-) -> void:
+func _show_hacking_item_task(state: Dictionary, animate: bool = false) -> void:
 	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
-	if quest_ui != null:
-		var state: Dictionary = SaveGame.office_mission_state(player)
+	if quest_ui == null:
+		return
+	var find_laptop := str(state.get("office_first_hacking_item", "")) == "cabo"
+	var item_collected := bool(
+		state.get("office_laptop_collected", false)
+		if find_laptop
+		else state.get("office_cable_collected", false)
+	)
+	if bool(state.get("office_dialog_finished", false)):
 		quest_ui.show_boss_room_and_cable_tasks(
 			bool(state.get("office_boss_room_access_found", false)),
-			completed,
+			item_collected,
 			animate,
-			hack_ready
+			bool(state.get("office_hack_boss_room_ready", false)),
+			bool(state.get("office_boss_room_hacked", false)),
+			false,
+			false,
+			find_laptop
 		)
+	else:
+		quest_ui.show_find_hacking_item_task(find_laptop, item_collected, animate)
+
+
+func _register_first_hacking_item(state: Dictionary, item: String) -> String:
+	var first_item := str(state.get("office_first_hacking_item", ""))
+	if first_item.is_empty():
+		first_item = item
+		state["office_first_hacking_item"] = first_item
+	return first_item
+
+
+func _refresh_npc_dialog() -> void:
+	if not is_instance_valid(npc):
+		return
+	var state: Dictionary = SaveGame.office_mission_state(player)
+	var has_laptop := bool(state.get("office_laptop_collected", false))
+	var has_cable := bool(state.get("office_cable_collected", false))
+	if not has_laptop and not has_cable:
+		return
+	var offer := ""
+	if has_laptop and has_cable:
+		offer = "Alex: Já achei um notebook e um cabo. Eu consigo hackear a porta da sala do chefe."
+	elif has_laptop:
+		offer = "Alex: Já achei um notebook. Se eu encontrar um cabo, consigo hackear a porta da sala do chefe."
+	else:
+		offer = "Alex: Já achei um cabo. Se eu encontrar um notebook, consigo hackear a porta da sala do chefe."
+	var dialog_texts: Array[String] = [
+		"Alex: Cadê todo mundo? O que aconteceu aqui?",
+		"Funcionário: A IA ficou maluca. Ela tomou o controle dos sistemas e está construindo uma superbomba.",
+		"Alex: Uma superbomba? Como isso foi acontecer?",
+		"Funcionário: O chefe fez alguma merda e perdeu o controle dela. A gente precisa falar com ele.",
+		"Alex: Então chama ele!",
+		"Funcionário: Eu já tentei. Ele não atende e a sala está trancada.",
+		offer,
+		"Funcionário: Eu vou voltar para o andar do data center. Enquanto isso, tenta pegar o cartão do chefe. Precisamos dele lá encima.",
+		"Alex: Certo. Eu vou atrás do cartão."
+	]
+	npc.set("dialog_texts", dialog_texts)
+
+
+func _handle_data_center_task(state: Dictionary) -> bool:
+	if bool(state.get("office_data_center_task_active", false)):
+		_show_go_to_sixth_floor_task(bool(state.get("office_data_center_task_completed", false)))
+		return true
+	if not bool(state.get("office_data_center_task_pending", false)):
+		return false
+	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
+	if quest_ui != null:
+		quest_ui.hide_all_tasks()
+	call_deferred("_show_data_center_prompt")
+	return true
+
+
+func _show_data_center_prompt() -> void:
+	await get_tree().create_timer(DATA_CENTER_PROMPT_DELAY, false).timeout
+	if not _is_current_office():
+		return
+	var state: Dictionary = SaveGame.office_mission_state(player)
+	if not bool(state.get("office_data_center_task_pending", false)):
+		return
+	player.balao_de_pensamento.enfileirar(
+		DATA_CENTER_FLOOR_ID,
+		"Onde era o data center? Acho que no 6º andar!"
+	)
+
+
+func _show_go_to_sixth_floor_task(completed: bool = false) -> void:
+	var quest_ui := player.get_node_or_null("QUEST_MISSION") as QuestMissionUI
+	if quest_ui != null:
+		quest_ui.show_go_to_sixth_floor_task(completed)
 
 
 func _unlock_boss_room_hack_task(state: Dictionary) -> bool:

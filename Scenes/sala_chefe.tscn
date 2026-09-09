@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bq87gqp7mwrnh" path="res://Interaction_components/interectable.tscn" id="5_a2vgb"]
 [ext_resource type="PackedScene" uid="uid://destem3uvhbqo" path="res://Objects/controle_de_tempo.tscn" id="5_sgpf2"]
 [ext_resource type="PackedScene" uid="uid://hloe5jawmgui" path="res://Scenes/pause_menu.tscn" id="6_a2vgb"]
+[ext_resource type="PackedScene" uid="uid://beo4uworw31ct" path="res://Objects/cartao_chefe.tscn" id="8_m1x1s"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dc347"]
 size = Vector2(32, 8.5)
@@ -64,3 +65,6 @@ shape = SubResource("RectangleShape2D_m1x1s")
 
 [node name="PauseMenu" parent="UI" unique_id=365074401 instance=ExtResource("6_a2vgb")]
 process_physics_priority = -6
+
+[node name="Cartao_chefe" parent="." unique_id=255975816 instance=ExtResource("8_m1x1s")]
+save_id = "cartao_chefe_sala_chefe"

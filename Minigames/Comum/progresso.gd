@@ -41,4 +41,4 @@ func abrir(jogo: int, fase: int) -> void:
 
 func menu() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://Interface/menu.tscn")
+	get_tree().change_scene_to_file("")

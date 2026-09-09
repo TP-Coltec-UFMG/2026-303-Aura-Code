@@ -12,6 +12,7 @@ var contador: Label
 var sons: SonsAsimov
 @onready var jogador = $Arena/Jogador
 @onready var objetivo = $Arena/Objetivo
+signal venceu
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -124,6 +125,7 @@ func vencer() -> void:
 	await get_tree().create_timer(0.45).timeout
 	if fase == 3:
 		abrir_modal("ACESSO LIBERADO", "Acesso a sala do chefe concedido", VisualAsimov.VERDE)
+		
 		
 	if fase < 3:
 		Progresso.abrir(jogo, fase + 1)

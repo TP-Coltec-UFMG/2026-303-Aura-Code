@@ -97,3 +97,14 @@ label_settings = SubResource("LabelSettingsTask")
 position = Vector2(-8, 6)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFramesCheck")
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer5" groups=["alto_contraste"]]
+layout_mode = 2
+text = "HACKEIE A SALA DO CHEFE!"
+label_settings = SubResource("LabelSettingsTask")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="VBoxContainer/HBoxContainer5"]
+position = Vector2(-8, 6)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFramesCheck")
